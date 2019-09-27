@@ -5,7 +5,7 @@ This application is a .NET Core based solution to [CS50's Crack problem](https:/
 I'm not responsible for any harm you may do to yourself or the others with this app. You've been warned! ;)
 
 ### Details
-CryptSharp uses bruteforce to guess words behind DES hashes. It keeps object allocation to minimum and uses [`Span<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.span-1) and [`ReadOnlySpan<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.readonlyspan-1) heavily across its codebase.
+CrackSharp uses bruteforce to guess words behind DES hashes. It keeps object allocation to minimum and uses [`Span<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.span-1) and [`ReadOnlySpan<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.readonlyspan-1) heavily across its codebase.
 
 The first two field in the `Program` class have the following meaning:
 ```csharp
