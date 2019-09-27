@@ -7,7 +7,7 @@ I'm not responsible for any harm you may do to yourself or the others with this 
 ### Details
 CrackSharp uses bruteforce to guess words behind DES hashes. It keeps object allocation to minimum and uses [`Span<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.span-1) and [`ReadOnlySpan<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.readonlyspan-1) heavily across its codebase.
 
-The first two field in the `Program` class have the following meaning:
+The first two fields in the `Program` class have the following meaning:
 ```csharp
 MaxWordLength = 4; // the app will only guess words up to 4 characters long
 AllowedChars = "abcXYZ"; // the app uses these characters to guess words
