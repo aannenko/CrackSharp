@@ -15,7 +15,7 @@ AllowedChars = "abcXYZ"; // the app uses these characters to guess words
 Uncomment a commented line in the `TryDecryptRecursive` method to see tested words in real time (it will decrease performance though).
 
 ### Usage
-Naturally you will need .NET Core installed.
+Naturally you will need [.NET Core](https://dotnet.microsoft.com/download/dotnet-core) installed.
 
 Example in PowerShell:
 ```
