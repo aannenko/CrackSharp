@@ -33,10 +33,10 @@ namespace CrackSharp
             var salt = hash.Slice(0, 2);
 
             // the algorithm processes shorter words first (a..Z, aa..ZZ)
-            for (int i = 1; i <= MaxWordLength; i++)
+            for (int i = 0; i < MaxWordLength; i++)
             {
-                Span<char> word = stackalloc char[i];
-                if (TryDecryptRecursive(salt, word, 0, i - 1, hash))
+                Span<char> word = stackalloc char[i + 1];
+                if (TryDecryptRecursive(salt, word, 0, i, hash))
                 {
                     decrypted = word.ToString();
                     return true;
