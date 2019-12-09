@@ -1,8 +1,8 @@
 using System;
 
-namespace CrackSharp
+namespace CrackSharp.Core
 {
-    public static class CryptSharp
+    public static class DesEncryptionService
     {
         private const string m_encryptionSaltCharacters =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
@@ -345,7 +345,7 @@ namespace CrackSharp
 
         private static readonly Random _random = new Random();
 
-        public static string Crypt(ReadOnlySpan<char> textToEncrypt)
+        public static string Encrypt(ReadOnlySpan<char> textToEncrypt)
         {
             int maxGeneratedNumber = m_encryptionSaltCharacters.Length;
             int randomIndex;
@@ -356,10 +356,10 @@ namespace CrackSharp
                 encryptionSalt[index] = m_encryptionSaltCharacters[randomIndex];
             }
 
-            return Crypt(encryptionSalt, textToEncrypt);
+            return Encrypt(encryptionSalt, textToEncrypt);
         }
 
-        public static string Crypt(ReadOnlySpan<char> encryptionSalt, ReadOnlySpan<char> textToEncrypt)
+        public static string Encrypt(ReadOnlySpan<char> encryptionSalt, ReadOnlySpan<char> textToEncrypt)
         {
             if (encryptionSalt.Length != 2)
                 throw new ArgumentException("Encryption salt must be 2 characters long.", nameof(encryptionSalt));
