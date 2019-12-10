@@ -11,10 +11,11 @@ From this repository OpenShift can create a container with a running web service
 4. Find your new route in OpenShift web console's Networking -> Routes menu and test the app by opening `<route_address>/api/v1/des` in a browser.
 
 ### Docker Deployment
-1. `cd` to the repository root
+1. Clone this repository and `cd` to its root
 2. `docker build -t crack-sharp .` - create a Docker image
-3.1. `docker run -it --rm -p 8080:80 --name crack-sharp crack-sharp` - this command runs a container with its console output redirected to your terminal and will remove container's files once it is stopped (useful for testing/debugging the app)
-3.2. `docker run -d -p 8080:80 --name crack-sharp crack-sharp` - this command launches a container and returns immediately (fire-and-forget).
+3. Use one of the following commands:
+- `docker run -it --rm -p 8080:80 --name crack-sharp crack-sharp` - this command runs a container with its console output redirected to your terminal and will remove container's files once it is stopped (useful for testing/debugging the app)
+- `docker run -d -p 8080:80 --name crack-sharp crack-sharp` - this command launches a container and returns immediately (fire-and-forget).
 4. Test the app by opening `<container_address>/api/v1/des` in a browser.
 
 ### Usage
@@ -32,4 +33,4 @@ Invoke-WebRequest -Uri "<route_or_contrainer_address>/api/v1/des?maxWordLength=4
 #### Remarks
 1. Primary goal of each request to this web service is to decrypt the specified DES hash. It means that the parameters `maxWordLength` and `chars` will be ignored if the service already knows a decrypted value of the hash. Also if two requests to decrypt the same hash are made at the same moment but with different values for `chars` and/or `maxWordLength`, two separate decryption tasks will start and each task will periodically check if the hash is already decrypted (and cached) by the other task - in which case it will immediately return decrypted value even if it's not composable from the specified `chars` or is longer than `maxWordLength`.
 
-2. If decrypting a hash in OpenShift container takes longer than 30 seconds, chances are you will see an error `504 Gateway Time-out The server didn't respond in time.` coming from your OpenShift route. At the time of writing, to fix this I had to add an annotation to the route with a key `haproxy.router.openshift.io/timeout` and value `10m` which increased the timeout to 10 minutes (according to [this](https://docs.openshift.com/container-platform/4.2/networking/routes/route-configuration.html) article).
+2. If decrypting a hash with an OpenShift-hosted app takes longer than 30 seconds, chances are you will see an error `504 Gateway Time-out The server didn't respond in time.` coming from your OpenShift route. At the time of writing, to fix this I had to add an annotation to the route with a key `haproxy.router.openshift.io/timeout` and value `10m` which increased the timeout to 10 minutes (according to [this](https://docs.openshift.com/container-platform/4.2/networking/routes/route-configuration.html) article).
