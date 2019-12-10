@@ -20,7 +20,7 @@ From this repository OpenShift can create a container with a running web service
 ### Usage
 1. Execute the following command in PowerShell substituting `<route_or_container_address>` with the appropriate value:
 ``` PowerShell
-Invoke-WebRequest -Uri "<route_or contrainer_address>/api/v1/des?maxWordLength=4&hash=50.jPgLzVirkc" -UseBasicParsing -TimeoutSec 30
+Invoke-WebRequest -Uri "<route_or_contrainer_address>/api/v1/des?maxWordLength=4&hash=50.jPgLzVirkc" -UseBasicParsing -TimeoutSec 30
 ```
 2. *Output*: you will almost immediately see `hi` - that's the word behind the DES hash `50.jPgLzVirkc`
 
