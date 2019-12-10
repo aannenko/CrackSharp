@@ -3,5 +3,5 @@ mono: none
 dotnet: 3.1.100
 script:
 - |
-  dotnet build CrackSharp.Cmd
-  dotnet build CrackSharp.Api
+  dotnet build src/CrackSharp.Cmd
+  dotnet build src/CrackSharp.Api
