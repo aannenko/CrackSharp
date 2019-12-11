@@ -5,7 +5,7 @@ Use code in this directory to build a console application, capable of bruteforci
 The first two fields in the `Program` class have the following meaning:
 ```csharp
 MaxWordLength = 5; // the app will only guess words up to 5 characters long
-Chars = "abcXYZ"; // the app uses these characters to guess words
+Chars = "abcXYZ"; // the app will only build words from these characters
 ```
 ### Usage
 Naturally, you will need [.NET Core](https://dotnet.microsoft.com/download/dotnet-core/3.1) installed.
@@ -20,10 +20,7 @@ dotnet build -c Release
 cd .\bin\Release\netcoreapp3.1
 .\crack.exe 50E5eT91y/Q.g
 ```
-Output (decryption took around 15 seconds on a test machine):
-```
-tOaD
-```
+Output: `tOaD`
 
-### A challenge for the meticulous who study CS50
-Make your application decrypt hashes faster than this one. ;)
+### Remarks
+The longer the word behind a hash, the longer it will take to decrypt this hash. Decryption of `50E5eT91y/Q.g` (corresponds to `tOaD`) takes around 15 seconds on a test machine, the hash `50.jPgLzVirkc` (`hi`) gets decrypted almost instantly.
