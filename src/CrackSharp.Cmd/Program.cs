@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Threading.Tasks;
 using CrackSharp.Core;
 
@@ -26,9 +25,6 @@ namespace CrackSharp.Cmd
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                if (e.Data.Count > 0)
-                    foreach (DictionaryEntry? error in e.Data)
-                        Console.WriteLine($"  {error?.Key, -15}- {error?.Value}");
             }
 
             return 1;
