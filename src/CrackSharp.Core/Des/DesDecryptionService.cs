@@ -24,7 +24,8 @@ namespace CrackSharp.Core
             _cache = cache;
         }
 
-        public Task<string> DecryptAsync(string hash, int maxWordLength, string? chars = null, CancellationToken token = default)
+        public Task<string> DecryptAsync(string hash, int maxWordLength, string? chars = null,
+            CancellationToken token = default)
         {
             if (hash?.Length != 13 || !_stringValidator.IsMatch(hash))
                 throw new ArgumentException(
