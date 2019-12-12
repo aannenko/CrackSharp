@@ -30,8 +30,8 @@ namespace CrackSharp.Core
                 throw new ArgumentException(
                     "Value must consist of exactly 13 chars that exist in the set [a-zA-Z0-9./].", nameof(hash));
 
-            if (maxWordLength < 1)
-                throw new ArgumentException("Value cannot be less than 1.", nameof(maxWordLength));
+            if (maxWordLength < 1 || maxWordLength > 8)
+                throw new ArgumentException("Value must be between 1 and 8.", nameof(maxWordLength));
 
             if (TryGetCachedValue(ref hash, out var result))
             {

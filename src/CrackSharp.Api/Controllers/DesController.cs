@@ -29,7 +29,7 @@ namespace CrackSharp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<string>> Get(
             [RegularExpression("^[a-zA-Z0-9./]{13}$")] string hash,
-            [Required, Range(1, int.MaxValue)] int maxWordLength,
+            [Required, Range(1, 8)] int maxWordLength,
             string? chars)
         {
             var logMessage = $"Decryption of {nameof(hash)} '{hash}' " +
