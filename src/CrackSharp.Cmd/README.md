@@ -21,6 +21,3 @@ cd .\bin\Release\netcoreapp3.1
 .\crack.exe 50E5eT91y/Q.g
 ```
 Output: `tOaD`
-
-### Remarks
-The longer the word behind a hash, the longer it will take to decrypt this hash. Decryption of `50E5eT91y/Q.g` (corresponds to `tOaD`) takes around 15 seconds on a test machine, the hash `50.jPgLzVirkc` (`hi`) gets decrypted almost instantly.

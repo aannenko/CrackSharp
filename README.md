@@ -13,3 +13,7 @@ The repository contains source code for three projects:
 
 ### Usage
 Deployment and usage examples are located in the corresponding project directories.
+
+### Decryption speed
+1. The longer the word behind a hash, the longer it will take to decrypt this hash.
+2. Same applies to a charset you feed to the app which it then uses to build words: decryption of `50E5eT91y/Q.g` with a charset `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789` (letters and digits) takes approximately 58% longer than with the same charset with digits removed.
