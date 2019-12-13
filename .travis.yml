@@ -1,6 +1,7 @@
 language: csharp
 mono: none
-dotnet: 3.1.100
-script:
-- dotnet build src/CrackSharp.Cmd
-- dotnet build src/CrackSharp.Api
+dotnet: 3.1
+env:
+- PROJECT_PATH=src/CrackSharp.Cmd
+- PROJECT_PATH=src/CrackSharp.Api
+script: "dotnet build $PROJECT_PATH"
