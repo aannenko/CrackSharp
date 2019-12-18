@@ -27,8 +27,8 @@ Invoke-WebRequest -Uri "<address>/api/v1/des?hash=50.jPgLzVirkc" -UseBasicParsin
 
 #### Available params
 - `hash=<some_des_hash_here>` - the service will attempt to find a combination of characters behind the given DES hash.
-- `maxWordLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value for `maxWordLength` is 8.
-- `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value for `chars` is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
+- `maxWordLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value for is `8`.
+- `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
 ### Remarks
 1. Primary goal of each request to this web service is to decrypt the specified DES hash. It means that the parameters `maxWordLength` and `chars` will be ignored if the service already knows a decrypted value of the hash. Also if two requests to decrypt the same hash are made at the same moment but with different values for `chars` and/or `maxWordLength`, two separate decryption tasks will start and each task will periodically check if the hash is already decrypted (and cached) by the other task - in which case it will immediately return decrypted value even if it's not composable from the specified `chars` or is longer than `maxWordLength`.
