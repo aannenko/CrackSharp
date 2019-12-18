@@ -29,8 +29,8 @@ namespace CrackSharp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<string>> Get(
             [RegularExpression("^[a-zA-Z0-9./]{13}$")] string hash,
-            [Required, Range(1, 8)] int maxWordLength,
-            string? chars)
+            [Range(1, 8)] int maxWordLength = 8,
+            [RegularExpression("^[a-zA-Z0-9./]+$")] string? chars = null)
         {
             var logMessage = $"Decryption of {nameof(hash)} '{hash}' " +
                 $"with {nameof(maxWordLength)} = {maxWordLength} " +
@@ -42,7 +42,7 @@ namespace CrackSharp.Api.Controllers
             }
             catch (DecryptionFailedException e)
             {
-                _logger.LogError($"{logMessage} failed:{Environment.NewLine}{e.Message}");
+                _logger.LogError($"{logMessage} failed: {e.Message}");
                 return NotFound();
             }
             catch (OperationCanceledException)
@@ -52,9 +52,7 @@ namespace CrackSharp.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"{logMessage} failed:{Environment.NewLine}" +
-                    $"{e.Message}{Environment.NewLine}{e.StackTrace}");
-
+                _logger.LogError($"{logMessage} failed: {e.Message}{Environment.NewLine}{e.StackTrace}");
                 throw;
             }
         }

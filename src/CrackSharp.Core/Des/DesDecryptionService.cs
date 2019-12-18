@@ -24,16 +24,13 @@ namespace CrackSharp.Core
             _cache = cache;
         }
 
-        public Task<string> DecryptAsync(string hash, int maxWordLength, string? chars = null,
+        public Task<string> DecryptAsync(string hash, int maxWordLength = 8, string? chars = null,
             CancellationToken token = default)
         {
-            if (hash?.Length != 13 || !_stringValidator.IsMatch(hash))
-                throw new ArgumentException(
-                    "Value must consist of exactly 13 chars that exist in the set [a-zA-Z0-9./].", nameof(hash));
+            _logger?.LogInformation($"Decryption of {nameof(hash)} '{hash}' with " +
+                $"{nameof(maxWordLength)} = {maxWordLength} and {nameof(chars)} = '{chars}' requested.");
 
-            if (maxWordLength < 1 || maxWordLength > 8)
-                throw new ArgumentOutOfRangeException(nameof(maxWordLength), maxWordLength,
-                    "Value must be between 1 and 8.");
+            var newChars = ValidateInput(ref hash, maxWordLength, ref chars);
 
             if (TryGetCachedValue(ref hash, out var result))
             {
@@ -42,10 +39,6 @@ namespace CrackSharp.Core
 
                 return Task.FromResult(result);
             }
-
-            if (!AreCharsValid(ref chars, out var newChars))
-                _logger?.LogWarning($"Argument {nameof(chars)} has invalid value '{chars}', " +
-                    $"it will be replaced with '{newChars}'.");
 
             _logger?.LogInformation($"Decrypting {nameof(hash)} '{hash}' " +
                 $"with {nameof(maxWordLength)} = {maxWordLength} and {nameof(chars)} = '{newChars}'.");
@@ -73,6 +66,26 @@ namespace CrackSharp.Core
                         return result;
                     }, token));
             });
+        }
+
+        private string ValidateInput(ref string hash, int maxWordLength, ref string? chars)
+        {
+            if (hash?.Length != 13 || !_stringValidator.IsMatch(hash))
+                throw new ArgumentException(
+                    "Value must consist of exactly 13 chars that exist in the set [a-zA-Z0-9./].", nameof(hash));
+
+            if (maxWordLength < 1 || maxWordLength > 8)
+                throw new ArgumentOutOfRangeException(nameof(maxWordLength), maxWordLength,
+                    "Value must be between 1 and 8.");
+
+            string newChars;
+            if (chars != (newChars = (chars == null || !_stringValidator.IsMatch(chars)
+                ? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                : new string(chars.Distinct().ToArray()))))
+                _logger?.LogWarning($"Argument {nameof(chars)} has invalid value '{chars}', " +
+                    $"it will be replaced with '{newChars}'.");
+
+            return newChars;
         }
 
         private bool TryGetCachedValue(ref string hash, out string result)
@@ -135,15 +148,6 @@ namespace CrackSharp.Core
             }
 
             return false;
-        }
-
-        private static bool AreCharsValid(ref string? chars, out string newChars)
-        {
-            newChars = chars == null || !_stringValidator.IsMatch(chars)
-                ? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-                : new string(chars.Distinct().ToArray());
-
-            return newChars == chars;
         }
     }
 }

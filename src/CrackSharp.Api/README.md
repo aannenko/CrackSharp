@@ -21,13 +21,13 @@ From this repository OpenShift can create a container with a running web service
 ### Usage
 1. Execute the following command in PowerShell substituting `<address>` with the appropriate value:
 ``` PowerShell
-Invoke-WebRequest -Uri "<address>/api/v1/des?maxWordLength=4&hash=50.jPgLzVirkc" -UseBasicParsing -TimeoutSec 30
+Invoke-WebRequest -Uri "<address>/api/v1/des?hash=50.jPgLzVirkc" -UseBasicParsing -TimeoutSec 30
 ```
 2. *Output*: you will almost immediately see `hi` - that's the word behind the DES hash `50.jPgLzVirkc`
 
 #### Available params
-- `hash=<some_des_hash_here>` - the service will attempt to find a combination of characters behind the given DES hash. It will tell you if the hash is invalid.
-- `maxWordLength=<your_number_here>` - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. The value shoud be between 1 and 8.
+- `hash=<some_des_hash_here>` - the service will attempt to find a combination of characters behind the given DES hash.
+- `maxWordLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value for `maxWordLength` is 8.
 - `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value for `chars` is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
 ### Remarks
