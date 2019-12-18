@@ -28,7 +28,7 @@ namespace CrackSharp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status408RequestTimeout)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<string>> Get(
-            [RegularExpression("^[a-zA-Z0-9./]{13}$")] string hash,
+            [Required, RegularExpression("^[a-zA-Z0-9./]{13}$")] string hash,
             [Range(1, 8)] int maxWordLength = 8,
             [RegularExpression("^[a-zA-Z0-9./]+$")] string? chars = null)
         {
