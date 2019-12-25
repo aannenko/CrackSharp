@@ -1,4 +1,4 @@
-![](https://github.com/aannenko/CrackSharp/workflows/Build/badge.svg?branch=master)
+[![Build](https://github.com/aannenko/CrackSharp/workflows/Build/badge.svg?branch=master)](https://github.com/aannenko/CrackSharp/actions)
 
 # CrackSharp
 Use code in this repository to build and run .NET Core applications that are able to efficiently decrypt DES hashes. Decryption process is based on brute-force method.
