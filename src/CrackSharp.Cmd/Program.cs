@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CrackSharp.Core;
+using CrackSharp.Core.Des;
 
 namespace CrackSharp.Cmd
 {
@@ -13,13 +13,13 @@ namespace CrackSharp.Cmd
         {
             if (args.Length != 1)
             {
-                Console.WriteLine("Usage: ./crack hash");
+                Console.WriteLine("Usage: ./crack hash\n");
                 return 1;
             }
 
             try
             {
-                Console.WriteLine($"{await new DesDecryptionService().DecryptAsync(args[0], MaxWordLength, Chars)}\n");
+                Console.WriteLine($"{await DesDecryptor.DecryptAsync(args[0], MaxWordLength, Chars)}\n");
                 return 0;
             }
             catch (Exception e)

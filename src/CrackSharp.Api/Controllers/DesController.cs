@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using CrackSharp.Api.Services.Des;
 using CrackSharp.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,33 +13,35 @@ namespace CrackSharp.Api.Controllers
     [Route("api/v1/[controller]")]
     public class DesController : ControllerBase
     {
+        private const string DefaultChars =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
         private readonly ILogger<DesController> _logger;
         private readonly DesDecryptionService _decryptor;
+        private readonly DesEncryptionService _encryptor;
 
-        public DesController(ILogger<DesController> logger, DesDecryptionService decryptor)
+        public DesController(ILogger<DesController> logger, DesDecryptionService decryptor,
+            DesEncryptionService encryptor)
         {
             _logger = logger;
             _decryptor = decryptor;
+            _encryptor = encryptor;
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status408RequestTimeout)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet("decrypt")]
         public async Task<ActionResult<string>> Get(
             [Required, RegularExpression("^[a-zA-Z0-9./]{13}$")] string hash,
-            [Range(1, 8)] int maxWordLength = 8,
-            [RegularExpression("^[a-zA-Z0-9./]+$")] string? chars = null)
+            [Range(1, 8)] int maxTextLength = 8,
+            [RegularExpression("^[a-zA-Z0-9./]+$")] string? chars = DefaultChars)
         {
-            var logMessage = $"Decryption of {nameof(hash)} '{hash}' " +
-                $"with {nameof(maxWordLength)} = {maxWordLength} " +
+            var logMessage = $"Decryption of the {nameof(hash)} '{hash}' " +
+                $"with {nameof(maxTextLength)} = {maxTextLength} " +
                 $"and {nameof(chars)} = '{chars}'";
 
             try
             {
-                return await _decryptor.DecryptAsync(hash, maxWordLength, chars, HttpContext.RequestAborted);
+                return await _decryptor.DecryptAsync(hash, maxTextLength, chars ?? DefaultChars,
+                    HttpContext.RequestAborted);
             }
             catch (DecryptionFailedException e)
             {
@@ -53,6 +56,23 @@ namespace CrackSharp.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError($"{logMessage} failed: {e.Message}{Environment.NewLine}{e.StackTrace}");
+                throw;
+            }
+        }
+
+        [HttpGet("encrypt")]
+        public string Get([Required] string text,
+            [RegularExpression("^[a-zA-Z0-9./]{2}$")] string? salt = null)
+        {
+            try
+            {
+                return _encryptor.Encrypt(text, salt);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Encryption of the {nameof(text)} '{text}' with " +
+                    $"{nameof(salt)} '{salt}' failed: {e.Message}{Environment.NewLine}{e.StackTrace}");
+
                 throw;
             }
         }

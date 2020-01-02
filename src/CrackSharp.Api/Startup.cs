@@ -1,4 +1,4 @@
-using CrackSharp.Core;
+using CrackSharp.Api.Services.Des;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Caching.Memory;
@@ -23,12 +23,13 @@ namespace CrackSharp.Api
             services.AddControllers();
 
             var cacheSizeLimit = Configuration.GetSection("Decryption")?.GetValue("CacheSizeBytes", 52428800);
-            services.AddSingleton<IMemoryCache>(new MemoryCache(new MemoryCacheOptions
+            services.AddTransient<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions
             {
                 SizeLimit = cacheSizeLimit != null && cacheSizeLimit > 1023 ? cacheSizeLimit : 52428800
             }));
 
             services.AddSingleton<DesDecryptionService>();
+            services.AddSingleton<DesEncryptionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

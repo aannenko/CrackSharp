@@ -1,8 +1,8 @@
 using System;
 
-namespace CrackSharp.Core
+namespace CrackSharp.Core.Des
 {
-    public static class DesEncryptionService
+    public static class DesEncryptor
     {
         private const string m_encryptionSaltCharacters =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
@@ -356,10 +356,10 @@ namespace CrackSharp.Core
                 encryptionSalt[index] = m_encryptionSaltCharacters[randomIndex];
             }
 
-            return Encrypt(encryptionSalt, textToEncrypt);
+            return Encrypt(textToEncrypt, encryptionSalt);
         }
 
-        public static string Encrypt(ReadOnlySpan<char> encryptionSalt, ReadOnlySpan<char> textToEncrypt)
+        public static string Encrypt(ReadOnlySpan<char> textToEncrypt, ReadOnlySpan<char> encryptionSalt)
         {
             if (encryptionSalt.Length != 2)
                 throw new ArgumentException("Encryption salt must be 2 characters long.", nameof(encryptionSalt));
