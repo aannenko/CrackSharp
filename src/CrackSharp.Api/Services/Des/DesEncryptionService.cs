@@ -45,10 +45,10 @@ namespace CrackSharp.Api.Services.Des
             }
 
             _cache.GetOrCreate(textAndSalt, cacheEntry =>
-                {
-                    cacheEntry.Size = 13;
-                    return hash;
-                });
+            {
+                cacheEntry.Size = 13;
+                return hash;
+            });
 
             _logger.LogInformation($"Encryption of {nameof(text)} '{text}' with {saltDescription} succeeded. " +
                 $"Encrypted value is '{hash}'.");

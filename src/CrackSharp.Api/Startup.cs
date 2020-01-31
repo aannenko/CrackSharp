@@ -22,10 +22,10 @@ namespace CrackSharp.Api
         {
             services.AddControllers();
 
-            var cacheSizeLimit = Configuration.GetSection("Decryption")?.GetValue("CacheSizeBytes", 52428800);
             services.AddTransient<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions
             {
-                SizeLimit = cacheSizeLimit != null && cacheSizeLimit > 1023 ? cacheSizeLimit : 52428800
+                SizeLimit = Configuration.GetSection("Decryption")?
+                    .GetValue("CacheSizeBytes", 52428800) ?? 52428800
             }));
 
             services.AddSingleton<DesDecryptionService>();

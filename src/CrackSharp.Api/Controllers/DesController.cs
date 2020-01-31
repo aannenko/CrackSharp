@@ -40,8 +40,8 @@ namespace CrackSharp.Api.Controllers
 
             try
             {
-                return await _decryptor.DecryptAsync(hash, maxTextLength, chars ?? DefaultChars,
-                    HttpContext.RequestAborted);
+                return await _decryptor.DecryptAsync(hash, maxTextLength,
+                    chars ?? DefaultChars, HttpContext.RequestAborted);
             }
             catch (DecryptionFailedException e)
             {
