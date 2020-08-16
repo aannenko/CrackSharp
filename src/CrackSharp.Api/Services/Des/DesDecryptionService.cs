@@ -76,12 +76,12 @@ namespace CrackSharp.Api.Services.Des
                     }
                 };
 
-                var text = await _cache.GetOrCreateAsync(hash, cacheEntry => Task.Run(async () =>
+                var text = await _cache.GetOrCreateAsync(hash, async cacheEntry =>
                 {
                     var text = await decryption();
                     cacheEntry.Size = text.Length;
                     return text;
-                }, token));
+                });
 
                 hashDecryption.CancelAll();
                 return text;
