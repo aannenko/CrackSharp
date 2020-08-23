@@ -22,32 +22,15 @@ namespace CrackSharp.Api.Services.Des
 
             _logger.LogInformation($"Encryption of {nameof(text)} '{text}' with {saltDescription} requested.");
 
-            string hash;
-            string textAndSalt;
-            if (isSaltEmpty)
-            {
-                hash = DesEncryptor.Encrypt(text);
-                salt = hash.Substring(0, 2);
-                textAndSalt = text + salt;
-            }
-            else
-            {
-                textAndSalt = text + salt;
-                if (_cache.TryGetValue<string>(textAndSalt, out var cachedHash))
-                {
-                    _logger.LogInformation($"Encrypted value of the {nameof(text)} '{text}' " +
-                        $"was found in cache; the value is '{cachedHash}'.");
+            string hash = isSaltEmpty
+                ? DesEncryptor.Encrypt(text)
+                : DesEncryptor.Encrypt(text, salt);
 
-                    return cachedHash;
-                }
-
-                hash = DesEncryptor.Encrypt(text, salt);
-            }
-
-            _cache.GetOrCreate(textAndSalt, cacheEntry =>
+            _cache.GetOrCreate(hash, cacheEntry =>
             {
-                cacheEntry.Size = 13;
-                return hash;
+                var trimmedText = text.Length < 8 ? text : text.Substring(0, 8);
+                cacheEntry.Size = trimmedText.Length;
+                return trimmedText;
             });
 
             _logger.LogInformation($"Encryption of {nameof(text)} '{text}' with {saltDescription} succeeded. " +

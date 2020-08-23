@@ -365,7 +365,7 @@ namespace CrackSharp.Core.Des
                 throw new ArgumentException("Encryption salt must be 2 characters long.", nameof(encryptionSalt));
 
             Span<byte> encryptionKey = stackalloc byte[8];
-            for (int index = 0; index < encryptionKey.Length && index < textToEncrypt.Length; index++)
+            for (int index = 0; index < textToEncrypt.Length && index < encryptionKey.Length; index++)
                 encryptionKey[index] = (byte)(Convert.ToInt32(textToEncrypt[index]) << 1);
 
             Span<uint> schedule = stackalloc uint[m_desIterations * 2];
