@@ -10,10 +10,11 @@ namespace CrackSharp.Api.Services.Des
 {
     public class DesDecryptionService
     {
+        private static readonly ConcurrentDictionary<string, HashDecryption> _runningDecryptions =
+            new ConcurrentDictionary<string, HashDecryption>();
+
         private readonly ILogger<DesDecryptionService> _logger;
         private readonly IMemoryCache _cache;
-        private readonly ConcurrentDictionary<string, HashDecryption> _runningDecryptions =
-            new ConcurrentDictionary<string, HashDecryption>();
 
         public DesDecryptionService(ILogger<DesDecryptionService> logger, IMemoryCache cache)
         {
