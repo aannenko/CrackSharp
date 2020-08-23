@@ -28,7 +28,7 @@ namespace CrackSharp.Api.Services.Des
 
             _cache.GetOrCreate(hash, cacheEntry =>
             {
-                var trimmedText = text.Length < 8 ? text : text.Substring(0, 8);
+                var trimmedText = text.Length <= 8 ? text : text.Substring(0, 8);
                 cacheEntry.Size = trimmedText.Length;
                 return trimmedText;
             });
