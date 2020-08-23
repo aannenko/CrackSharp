@@ -1,7 +1,7 @@
 ## CrackSharp.Api
-Use code in this directory to build a .NET Core WebAPI service, capable of bruteforcing DES hashes using a specified charset and expected length of the text behind the hash. It can decrypt multiple hashes in parallel: it starts a new decryption task for each *unique* set of parameters and then each task periodically checks if the hash has already been decrypted by the other tasks.
+Use code in this directory to build a .NET Core WebAPI service, capable of bruteforcing DES hashes using a specified charset and expected length of the text behind the hash. It can decrypt multiple hashes in parallel: it starts a new decryption task for each *unique* set of parameters (see remarks below).
 
-The service also allows to calculate DES hashes from arbitrary text and (optionally) salt.
+The service also allows to calculate DES hashes from arbitrary text and, optionally, salt.
 
 From this repository OpenShift can create a container with a running web service inside using its S2I (Source-To-Image) tool.
 
@@ -33,10 +33,12 @@ From this repository OpenShift can create a container with a running web service
 - `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
 *Encryption*
-- `text=<text_to_encrypt>` - the service will encrypt the specified text and return encryption result. If salt is not specified by the user, it is generated automatically.
+- `text=<text_to_encrypt>` - the service will encrypt first 8 characters of the specified text (see remarks below) and return encryption result. If salt is not specified by the user, it is generated automatically.
 - `salt=<encryption_salt>` (optional) - salt allows for predictable encryption results. The first two characters of a DES hash is its salt.
 
 ### Remarks
-1. Primary goal of each decryption request to this web service is to decrypt the specified DES hash. It means that the parameters `maxTextLength` and `chars` will be ignored if the service already knows a decrypted value of the hash. Also if multiple requests to decrypt the same hash are made at the same moment but with different values for `chars` and/or `maxTextLength`, multiple decryption tasks will start; if any of these tasks decrypts the hash, all these tasks will immediately return decrypted value even if it's not composable from the specified `chars` or is longer than `maxTextLength`.
+1. Primary goal of each decryption request to this web service is to decrypt the specified DES hash. It means that the parameters `maxTextLength` and `chars` will be ignored if the service already knows a decrypted value of the hash. Also if multiple requests to decrypt the same hash are made at the same time but with different values for `chars` and/or `maxTextLength`, multiple decryption tasks will start. If any of these tasks decrypts the hash, all these tasks will immediately return decrypted value even if it's not composable from the specified `chars` or is longer than `maxTextLength`.
 
-2. If decrypting a hash with an OpenShift-hosted app takes longer than 30 seconds, chances are you will see an error `504 Gateway Time-out The server didn't respond in time.` coming from your OpenShift route. At the time of writing, to fix this I had to add an annotation to the route with a key `haproxy.router.openshift.io/timeout` and value `10m` which increased the timeout to 10 minutes (according to [this](https://docs.openshift.com/container-platform/4.2/networking/routes/route-configuration.html) article).
+2. Encryption requests will cache encryption results so that decryption requests could use them in the future. For example, a request `/api/v1/des/encrypt?text=tungstenite&salt=a1` will return `a1dosrPtorvEw`, and a subsequent request `/api/v1/des/decrypt?hash=50RgHJFoDQWXc` will instantly return `tungsten` ([crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html) only encrypts first 8 characters of the text). If encryption result was not readily available for the decryption request, decryption process would start and take some time to decrypt the hash.
+
+3. If decrypting a hash with an OpenShift-hosted app takes longer than 30 seconds, chances are you will see an error `504 Gateway Time-out The server didn't respond in time.` coming from your OpenShift route. At the time of writing, to fix this I had to add an annotation to the route with a key `haproxy.router.openshift.io/timeout` and value `10m` which increased the timeout to 10 minutes (according to [this](https://docs.openshift.com/container-platform/4.2/networking/routes/route-configuration.html) article).
