@@ -18,12 +18,12 @@ The service also allows to calculate crypt(3)-like DES hashes from arbitrary tex
 `<address>/api/v1/des/encrypt?text=LOL`. Output: hash that corresponds to `LOL` with its first two characters being an auto-generated salt.
 
 #### Available params
-*Decryption*
+Decryption
 - `hash=<some_des_hash_here>` - the service will attempt to find a combination of characters behind the given hash.
 - `maxTextLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value is `8`.
 - `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
-*Encryption*
+Encryption
 - `text=<text_to_encrypt>` - the service will encrypt first 8 characters of the specified text (see remarks below) and return encryption result. If salt is not specified by the user, it is generated automatically.
 - `salt=<encryption_salt>` (optional) - salt allows for predictable encryption results. The first two characters of a hash is its salt.
 
