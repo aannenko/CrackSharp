@@ -1,16 +1,7 @@
 ## CrackSharp.Api
-Use code in this directory to build a .NET Core WebAPI service, capable of bruteforcing DES hashes using a specified charset and expected length of the text behind the hash. It can decrypt multiple hashes in parallel: it starts a new decryption task for each *unique* set of parameters (see remarks below).
+Use code in this directory to build a .NET Core WebAPI service, capable of bruteforcing DES hashes produced by [crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html), using a specified charset and expected length of the text behind the hash. It can decrypt multiple hashes in parallel: it starts a new decryption task for each *unique* set of parameters (see remarks below).
 
-The service also allows to calculate DES hashes from arbitrary text and, optionally, salt.
-
-From this repository OpenShift can create a container with a running web service inside using its S2I (Source-To-Image) tool.
-
-### OpenShift S2I Deployment
-0. *Prerequisite*: you should have a project in OpenShift, if you don't - create one
-1. Go to OpenShift web console's Developer Catalog, select .NET Core item there
-2. Select your project, then `dotnet:3.1`, give your new app a name in lower case and specify [this repo's address](https://github.com/aannenko/CrackSharp.git) as a source, tick the `Create route` checkbox and click `Create`
-3. Wait for the app to deploy
-4. Find your new route in OpenShift web console's Networking -> Routes menu, copy its address and test the app by opening `<route_address>/api/v1/des` in a browser.
+The service also allows to calculate crypt(3)-like DES hashes from arbitrary text and, optionally, salt.
 
 ### Docker Deployment
 1. Clone this repository and `cd` to its root
@@ -22,23 +13,21 @@ From this repository OpenShift can create a container with a running web service
 
 ### Usage
 1. To **decrypt** a hash `50.jPgLzVirkc`, open the following address in your web browser, substituting `<address>` with your web-service's address:
-`<address>/api/v1/des/decrypt?hash=50.jPgLzVirkc`. Output: `hi` - that's the text behind the DES hash `50.jPgLzVirkc`
+`<address>/api/v1/des/decrypt?hash=50.jPgLzVirkc`. Output: `hi` - that's the text behind the hash `50.jPgLzVirkc`
 2. To **encrypt** a word `LOL`, open the following address in your web browser, substituting `<address>` with your web-service's address:
-`<address>/api/v1/des/encrypt?text=LOL`. Output: DES hash that corresponds to `LOL` with its first two characters being an auto-generated salt.
+`<address>/api/v1/des/encrypt?text=LOL`. Output: hash that corresponds to `LOL` with its first two characters being an auto-generated salt.
 
 #### Available params
 *Decryption*
-- `hash=<some_des_hash_here>` - the service will attempt to find a combination of characters behind the given DES hash.
+- `hash=<some_des_hash_here>` - the service will attempt to find a combination of characters behind the given hash.
 - `maxTextLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value is `8`.
 - `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
 *Encryption*
 - `text=<text_to_encrypt>` - the service will encrypt first 8 characters of the specified text (see remarks below) and return encryption result. If salt is not specified by the user, it is generated automatically.
-- `salt=<encryption_salt>` (optional) - salt allows for predictable encryption results. The first two characters of a DES hash is its salt.
+- `salt=<encryption_salt>` (optional) - salt allows for predictable encryption results. The first two characters of a hash is its salt.
 
 ### Remarks
-1. Primary goal of each decryption request to this web service is to decrypt the specified DES hash. It means that the parameters `maxTextLength` and `chars` will be ignored if the service already knows a decrypted value of the hash. Also if multiple requests to decrypt the same hash are made at the same time but with different values for `chars` and/or `maxTextLength`, multiple decryption tasks will start. If any of these tasks decrypts the hash, all these tasks will immediately return decrypted value even if it's not composable from the specified `chars` or is longer than `maxTextLength`.
+1. Primary goal of each decryption request to this web service is to decrypt the specified hash. It means that the parameters `maxTextLength` and `chars` will be ignored if the service already knows a decrypted value of the hash. Also if multiple requests to decrypt the same hash are made at the same time but with different values for `chars` and/or `maxTextLength`, multiple decryption tasks will start. If any of these tasks decrypts the hash, all these tasks will immediately return decrypted value even if it's not composable from the specified `chars` or is longer than `maxTextLength`.
 
-2. Encryption requests will cache encryption results so that decryption requests could use them in the future. For example, a request `/api/v1/des/encrypt?text=tungstenite&salt=a1` will return `a1dosrPtorvEw`, and a subsequent request `/api/v1/des/decrypt?hash=a1dosrPtorvEw` will instantly return `tungsten` ([crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html) only encrypts first 8 characters of the text). If the encryption result would not have been there for the decryption request to use, decryption process would start and take some time to decrypt the hash.
-
-3. If decrypting a hash with an OpenShift-hosted app takes longer than 30 seconds, chances are you will see an error `504 Gateway Time-out The server didn't respond in time.` coming from your OpenShift route. At the time of writing, to fix this I had to add an annotation to the route with a key `haproxy.router.openshift.io/timeout` and value `10m` which increased the timeout to 10 minutes (according to [this](https://docs.openshift.com/container-platform/4.2/networking/routes/route-configuration.html) article).
+2. Encryption requests will end in encryption results being cached so that decryption requests could use them in the future. For example, a request `/api/v1/des/encrypt?text=tungstenite&salt=a1` will return `a1dosrPtorvEw`, and a subsequent request `/api/v1/des/decrypt?hash=a1dosrPtorvEw` will instantly return `tungsten` (crypt(3) only encrypts first 8 characters of the text). If the encryption result would not have been there for the decryption request to use, decryption process would start and take some time to decrypt the hash.
