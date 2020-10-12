@@ -7,8 +7,8 @@ The service also allows to calculate crypt(3)-like DES hashes from arbitrary tex
 1. Clone this repository and `cd` to its root
 2. `docker build -t crack-sharp .` - create a Docker image
 3. Use one of the following commands:
-    - `docker run -it --rm -p 8080:80 --name crack-sharp crack-sharp` - this command runs a container with its console output redirected to your terminal and will remove container's files once it is stopped (useful for testing/debugging the app)
-    - `docker run -d -p 8080:80 --name crack-sharp crack-sharp` - this command launches a container and returns immediately (fire-and-forget).
+    - `docker run -it --rm -p 80:80 --name crack-sharp crack-sharp` - this command runs a container with its console output redirected to your terminal and will remove container's files once it is stopped (useful for testing/debugging the app)
+    - `docker run -d -p 80:80 --name crack-sharp crack-sharp` - this command launches a container and returns immediately (fire-and-forget).
 4. Test the app by opening `<container_address>/api/v1/des` in a browser.
 
 ### Usage
