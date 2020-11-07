@@ -13,4 +13,4 @@ WORKDIR /app
 
 # Copy build results and run the app
 COPY --from=build /app/out .
-ENTRYPOINT ["dotnet", "CrackSharp.Api.dll"]
+ENTRYPOINT ["dotnet", "CrackSharp.Api.dll", "--urls", "http://+:5000"]

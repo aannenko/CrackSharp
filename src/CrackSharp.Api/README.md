@@ -7,9 +7,9 @@ The service also allows to calculate crypt(3)-like DES hashes from arbitrary tex
 1. Clone this repository and `cd` to its root
 2. `docker build -t crack-sharp .` - create a Docker image
 3. Use one of the following commands:
-    - `docker run -it --rm -p 80:80 --name crack-sharp crack-sharp` - this command runs a container with its console output redirected to your terminal and will remove container's files once it is stopped (useful for testing/debugging the app)
-    - `docker run -d -p 80:80 --name crack-sharp crack-sharp` - this command launches a container and returns immediately (fire-and-forget).
-4. Test the app by opening `<container_address>/api/v1/des` in a browser.
+    - `docker run -it --rm -p 5000:5000 --name crack-sharp crack-sharp` - this command runs a container with its console output redirected to your terminal and will remove container's files once it is stopped (useful for testing/debugging the app)
+    - `docker run -d -p 5000:5000 --name crack-sharp crack-sharp` - this command launches a container and returns immediately (fire-and-forget).
+4. Test the app by opening `<container_address>/api/v1/des/encrypt?text=test` in a browser.
 
 ### Usage
 1. To **decrypt** a hash `50.jPgLzVirkc`, open the following address in your web browser, substituting `<address>` with your web-service's address:
