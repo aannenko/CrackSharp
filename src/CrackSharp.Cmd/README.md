@@ -8,16 +8,16 @@ MaxWordLength = 5; // the app will only guess words up to 5 characters long
 Chars = "abcXYZ"; // the app will only build words from these characters
 ```
 ### Usage
-Naturally, you will need [.NET Core SDK](https://dotnet.microsoft.com/download/dotnet-core/3.1) installed.
+Naturally, you will need [.NET Core SDK](https://dotnet.microsoft.com/download/dotnet-core) installed.
 
-Example in PowerShell:
+Example in PowerShell/bash:
 ```
-dotnet run -c Release 50E5eT91y/Q.g
+dotnet run -c Release -- 50E5eT91y/Q.g
 ```
 or
 ```
-dotnet build -c Release
-cd .\bin\Release\netcoreapp3.1
-.\crack.exe 50E5eT91y/Q.g
+dotnet build -c Release -o out
+cd ./out
+./crack 50E5eT91y/Q.g
 ```
 Output: `tOaD`
