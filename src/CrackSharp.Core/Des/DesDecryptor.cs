@@ -23,7 +23,7 @@ namespace CrackSharp.Core.Des
                 throw new ArgumentOutOfRangeException(nameof(maxTextLength), maxTextLength,
                     "Value must be between 1 and 8.");
 
-            if (chars != null && !_stringValidator.IsMatch(chars))
+            if (chars == null || !_stringValidator.IsMatch(chars))
                 throw new ArgumentException(
                     "Value must consist of one or more chars from the set [a-zA-Z0-9./].", nameof(chars));
 
@@ -31,13 +31,13 @@ namespace CrackSharp.Core.Des
 
             return Task.Run(() =>
             {
-                var lastCharPosition = chars.Length - 1;
                 var salt = hash.AsSpan().Slice(0, 2);
+                Span<char> buffer = stackalloc char[maxTextLength];
                 for (int i = 0; i < maxTextLength; i++)
                 {
-                    Span<char> buffer = stackalloc char[i + 1];
-                    if (TryDecryptRecursive(ref hash, salt, ref chars, lastCharPosition, buffer, 0, i, token))
-                        return buffer.ToString();
+                    var slice = buffer.Slice(0, i + 1);
+                    if (TryDecryptRecursive(ref hash, salt, ref chars, slice, 0, i, token))
+                        return slice.ToString();
                 }
 
                 throw new DecryptionFailedException($"The {nameof(hash)} '{hash}' " +
@@ -47,17 +47,15 @@ namespace CrackSharp.Core.Des
         }
 
         private static bool TryDecryptRecursive(ref string hash, ReadOnlySpan<char> salt,
-            ref string chars, int lastCharPosition,
-            Span<char> buffer, int position, int maxPosition, CancellationToken token)
+            ref string chars, Span<char> buffer, int position, int maxPosition, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            for (int i = 0; i <= lastCharPosition; i++)
+            for (int i = 0; i < chars.Length; i++)
             {
                 buffer[position] = chars[i];
                 if (position < maxPosition)
                 {
-                    if (TryDecryptRecursive(ref hash, salt, ref chars, lastCharPosition,
-                        buffer, position + 1, maxPosition, token))
+                    if (TryDecryptRecursive(ref hash, salt, ref chars, buffer, position + 1, maxPosition, token))
                         return true;
                 }
                 else

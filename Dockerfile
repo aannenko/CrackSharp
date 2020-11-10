@@ -1,5 +1,5 @@
 # Use SDK image
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /app
 
 # Copy everything and build the app
@@ -8,7 +8,7 @@ COPY src/CrackSharp.Api/. ./CrackSharp.Api/
 RUN dotnet publish CrackSharp.Api -c Release -o out
 
 # Use runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS runtime
 WORKDIR /app
 
 # Copy build results and run the app

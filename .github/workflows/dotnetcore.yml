@@ -6,11 +6,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@main
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1.5.0
+    - uses: actions/checkout@v2
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.x'
+        dotnet-version: '5.0.x'
     - name: Build command line app
       run: dotnet build src/CrackSharp.Cmd --configuration Release
     - name: Build WebAPI app

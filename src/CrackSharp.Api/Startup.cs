@@ -20,6 +20,7 @@ namespace CrackSharp.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSwaggerGen();
 
             services.AddMemoryCache(mc => mc.SizeLimit =
                 Configuration.GetValue("Decryption:CacheSizeBytes", 52428800));
@@ -34,6 +35,8 @@ namespace CrackSharp.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CrackSharp.Api v1"));
             }
 
             app.UseHttpsRedirection();
