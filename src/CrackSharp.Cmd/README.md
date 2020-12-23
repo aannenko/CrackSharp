@@ -11,13 +11,13 @@ Chars = "abcXYZ"; // the app will only build words from these characters
 You will need [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) installed.
 
 Example in PowerShell/bash:
-```
-dotnet run -c Release -- 50E5eT91y/Q.g
+```powershell
+dotnet run -c Release -- 50cI2vYkF0YU2
 ```
 or
-```
+```powershell
 dotnet build -c Release -o out
 cd ./out
-./crack 50E5eT91y/Q.g
+./crack 50cI2vYkF0YU2
 ```
-Output: `tOaD`
+Output: `LOL`
