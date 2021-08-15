@@ -17,10 +17,10 @@ namespace CrackSharp.Api.Controllers
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
         private readonly ILogger<DesController> _logger;
-        private readonly DesDecryptionService _decryptor;
+        private readonly DesBruteForceDecryptionService _decryptor;
         private readonly DesEncryptionService _encryptor;
 
-        public DesController(ILogger<DesController> logger, DesDecryptionService decryptor,
+        public DesController(ILogger<DesController> logger, DesBruteForceDecryptionService decryptor,
             DesEncryptionService encryptor)
         {
             _logger = logger;

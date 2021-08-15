@@ -1,5 +1,5 @@
+using System;
 using CrackSharp.Core.Des;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CrackSharp.Api.Services.Des
@@ -7,9 +7,10 @@ namespace CrackSharp.Api.Services.Des
     public class DesEncryptionService
     {
         private readonly ILogger<DesEncryptionService> _logger;
-        private readonly IMemoryCache _cache;
+        private readonly DecryptionMemoryCache<string, string> _cache;
 
-        public DesEncryptionService(ILogger<DesEncryptionService> logger, IMemoryCache cache)
+        public DesEncryptionService(ILogger<DesEncryptionService> logger,
+            DecryptionMemoryCache<string, string> cache)
         {
             _logger = logger;
             _cache = cache;
@@ -22,10 +23,13 @@ namespace CrackSharp.Api.Services.Des
 
             _logger.LogInformation($"Encryption of {nameof(text)} '{text}' with {saltDescription} requested.");
 
-            string hash = isSaltEmpty
-                ? DesEncryptor.Encrypt(text)
-                : DesEncryptor.Encrypt(text, salt);
+            Span<char> hashBuffer = stackalloc char[13];
+            if (isSaltEmpty)
+                DesEncryptor.Encrypt(text, hashBuffer);
+            else
+                DesEncryptor.Encrypt(text, salt, hashBuffer);
 
+            var hash = hashBuffer.ToString();
             _cache.GetOrCreate(hash, cacheEntry =>
             {
                 var trimmedText = text.Length <= 8 ? text : text.Substring(0, 8);

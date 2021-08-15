@@ -1,3 +1,4 @@
+using CrackSharp.Api.Services;
 using CrackSharp.Api.Services.Des;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,9 +24,10 @@ namespace CrackSharp.Api
             services.AddSwaggerGen();
 
             services.AddMemoryCache(mc => mc.SizeLimit =
-                Configuration.GetValue("Decryption:CacheSizeBytes", 52428800));
+                Configuration.GetValue("Decryption:CacheSizeBytes", 52_428_800 /* 50 MB */));
 
-            services.AddSingleton<DesDecryptionService>();
+            services.AddSingleton(typeof(DecryptionMemoryCache<,>));
+            services.AddSingleton<DesBruteForceDecryptionService>();
             services.AddSingleton<DesEncryptionService>();
         }
 

@@ -345,7 +345,7 @@ namespace CrackSharp.Core.Des
 
         private static readonly Random _random = new Random();
 
-        public static string Encrypt(ReadOnlySpan<char> textToEncrypt)
+        public static void Encrypt(ReadOnlySpan<char> textToEncrypt, Span<char> outputBuffer)
         {
             int maxGeneratedNumber = m_encryptionSaltCharacters.Length;
             int randomIndex;
@@ -356,13 +356,16 @@ namespace CrackSharp.Core.Des
                 encryptionSalt[index] = m_encryptionSaltCharacters[randomIndex];
             }
 
-            return Encrypt(textToEncrypt, encryptionSalt);
+            Encrypt(textToEncrypt, encryptionSalt, outputBuffer);
         }
 
-        public static string Encrypt(ReadOnlySpan<char> textToEncrypt, ReadOnlySpan<char> encryptionSalt)
+        public static void Encrypt(ReadOnlySpan<char> textToEncrypt, ReadOnlySpan<char> encryptionSalt, Span<char> outputBuffer)
         {
             if (encryptionSalt.Length != 2)
                 throw new ArgumentException("Encryption salt must be 2 characters long.", nameof(encryptionSalt));
+
+            if (outputBuffer.Length != 13)
+                throw new ArgumentException("Output buffer must be 13 characters long.", nameof(outputBuffer));
 
             Span<byte> encryptionKey = stackalloc byte[8];
             for (int index = 0; index < textToEncrypt.Length && index < encryptionKey.Length; index++)
@@ -380,9 +383,8 @@ namespace CrackSharp.Core.Des
             binaryBuffer[8] = 0;
             int binaryBufferIndex = 0;
             uint bitChecker = 0x80;
-            Span<char> encryptionBuffer = stackalloc char[13];
-            encryptionBuffer[0] = encryptionSalt[0];
-            encryptionBuffer[1] = encryptionSalt[1];
+            outputBuffer[0] = encryptionSalt[0];
+            outputBuffer[1] = encryptionSalt[1];
             for (int index = 2; index < 13; index++)
             {
                 uint passwordCharacter = 0;
@@ -400,10 +402,8 @@ namespace CrackSharp.Core.Des
                     }
                 }
 
-                encryptionBuffer[index] = Convert.ToChar(m_characterConversionTable[passwordCharacter]);
+                outputBuffer[index] = Convert.ToChar(m_characterConversionTable[passwordCharacter]);
             }
-
-            return encryptionBuffer.ToString();
         }
 
         private static void SetDESKey(Span<byte> encryptionKey, Span<uint> schedule)
