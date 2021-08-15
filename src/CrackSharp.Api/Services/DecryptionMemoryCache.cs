@@ -8,7 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace CrackSharp.Api.Services
 {
-    public class DecryptionMemoryCache<TKey, TValue> where TKey : notnull
+    public class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
     {
         private readonly IMemoryCache _cache;
 
