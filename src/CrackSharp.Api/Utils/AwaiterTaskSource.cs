@@ -6,7 +6,7 @@ namespace CrackSharp.Api.Utils
 {
     public class AwaiterTaskSource<T>
     {
-        private readonly TaskCompletionSource _completion = new TaskCompletionSource();
+        private readonly TaskCompletionSource _completion = new();
         private readonly Lazy<Task<T>> _mainTask;
         private readonly CancellationTokenSource? _mainTaskCts;
         private int _awaitersCount = 0;
@@ -26,18 +26,21 @@ namespace CrackSharp.Api.Utils
 
         public async Task<T> GetAwaiterTask(CancellationToken cancellationToken = default)
         {
+            if (Completion.IsCompleted)
+                return await _mainTask.Value.ConfigureAwait(false);
+
             Interlocked.Increment(ref _awaitersCount);
             using var cancellation = new CancellationTokenTaskSource<T>(cancellationToken);
-            var mainOrCancellation = await Task.WhenAny(_mainTask.Value, cancellation.Task);
+            var mainOrCancellation = await Task.WhenAny(_mainTask.Value, cancellation.Task).ConfigureAwait(false);
             try
             {
-                return await mainOrCancellation;
+                return await mainOrCancellation.ConfigureAwait(false);
             }
             finally
             {
-                if (Interlocked.Decrement(ref _awaitersCount) < 1)
+                if (!Completion.IsCompleted && Interlocked.Decrement(ref _awaitersCount) == 0)
                 {
-                    _completion.SetResult();
+                    _completion.TrySetResult();
                     if (mainOrCancellation != _mainTask.Value)
                         _mainTaskCts?.Cancel();
                 }

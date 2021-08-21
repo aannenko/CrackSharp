@@ -18,7 +18,7 @@ namespace CrackSharp.Api.Utils
             }
             
             var tcs = new TaskCompletionSource<T>();
-            _registration = cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken), useSynchronizationContext: false);
+            _registration = cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken), false);
             Task = tcs.Task;
         }
 

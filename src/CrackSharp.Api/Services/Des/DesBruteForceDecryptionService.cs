@@ -18,7 +18,8 @@ namespace CrackSharp.Api.Services.Des
         private readonly ILogger<DesBruteForceDecryptionService> _logger;
         private readonly DecryptionMemoryCache<string, string> _cache;
 
-        public DesBruteForceDecryptionService(ILogger<DesBruteForceDecryptionService> logger,
+        public DesBruteForceDecryptionService(
+            ILogger<DesBruteForceDecryptionService> logger,
             DecryptionMemoryCache<string, string> cache)
         {
             _logger = logger;
@@ -56,7 +57,7 @@ namespace CrackSharp.Api.Services.Des
                 var awaiter = new AwaiterTaskSource<string>(async token =>
                 {
                     var (hash, prm) = hp;
-                    var text = await DesDecryptor.DecryptAsync(hp.Hash, new BruteForceEnumerable(prm), token);
+                    var text = await DesDecryptor.DecryptAsync(hash, new BruteForceEnumerable(prm), token);
                     _logger.LogInformation($"Decryption task '{taskId}' for the {nameof(hash)} '{hash}' " +
                         $"with {nameof(prm.MaxTextLength)} = {prm.MaxTextLength} " +
                         $"and {nameof(prm.Characters)} = '{prm.Characters}' succeeded. " +
@@ -65,13 +66,14 @@ namespace CrackSharp.Api.Services.Des
                     return text;
                 });
 
-                _ = awaiter.Completion.ContinueWith(t => _awaiters.TryRemove(hp, out _));
+                _ = awaiter.Completion.ContinueWith(t => _awaiters.TryRemove(hp, out _), TaskScheduler.Default);
                 return awaiter;
             }).GetAwaiterTask(linkedCts.Token);
-
+            
             var firstToComplete = await Task.WhenAny(cacheTask, decryptTask);
             var text = await firstToComplete;
             linkedCts.Cancel();
+            
             _cache.GetOrCreate(hash, cacheEntry =>
             {
                 cacheEntry.Size = text.Length;

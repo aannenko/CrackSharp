@@ -26,7 +26,7 @@ namespace CrackSharp.Api.Services
             var awaiterTask = _awaiters.GetOrAdd(key, k =>
             {
                 var awaiter = new AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>(() => tcs.Task, tcs);
-                _ = awaiter.Completion.ContinueWith(t => _awaiters.TryRemove(k, out _));
+                _ = awaiter.Completion.ContinueWith(t => _awaiters.TryRemove(k, out _), TaskScheduler.Default);
                 return awaiter;
             }).GetAwaiterTask(cancellationToken);
 
