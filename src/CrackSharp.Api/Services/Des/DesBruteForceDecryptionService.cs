@@ -47,32 +47,17 @@ namespace CrackSharp.Api.Services.Des
             CancellationToken cancellationToken)
         {
             var taskId = $"{hash} - {DateTime.UtcNow.ToString("o")}";
-            _logger.LogInformation($"Starting a decryption task '{taskId}' for a {nameof(hash)} '{hash}' " +
-                $"with {nameof(maxTextLength)} = {maxTextLength} and {nameof(chars)} = '{chars}'.");
+            _logger.LogInformation($"Starting a decryption task '{taskId}'. Parameters used: " +
+                $"{nameof(maxTextLength)} = {maxTextLength}, {nameof(chars)} = '{chars}'.");
 
             var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var cacheTask = _cache.AwaitValue(hash, linkedCts.Token);
-            var decryptTask = _awaiters.GetOrAdd(new(hash, new(maxTextLength, chars)), hp =>
-            {
-                var awaiter = new AwaiterTaskSource<string>(async token =>
-                {
-                    var (hash, prm) = hp;
-                    var text = await DesDecryptor.DecryptAsync(hash, new BruteForceEnumerable(prm), token);
-                    _logger.LogInformation($"Decryption task '{taskId}' for the {nameof(hash)} '{hash}' " +
-                        $"with {nameof(prm.MaxTextLength)} = {prm.MaxTextLength} " +
-                        $"and {nameof(prm.Characters)} = '{prm.Characters}' succeeded. " +
-                        $"The {nameof(hash)} '{hash}' corresponds to '{text}'.");
-
-                    return text;
-                });
-
-                _ = awaiter.Completion.ContinueWith(t => _awaiters.TryRemove(hp, out _), TaskScheduler.Default);
-                return awaiter;
-            }).GetAwaiterTask(linkedCts.Token);
+            var decryptTask = _awaiters.GetOrAdd(new(hash, new(maxTextLength, chars)), GetAwaiter)
+                .GetAwaiterTask(linkedCts.Token);
             
             var firstToComplete = await Task.WhenAny(cacheTask, decryptTask);
-            var text = await firstToComplete;
             linkedCts.Cancel();
+            var text = await firstToComplete;
             
             _cache.GetOrCreate(hash, cacheEntry =>
             {
@@ -80,11 +65,26 @@ namespace CrackSharp.Api.Services.Des
                 return text;
             });
 
-            if (firstToComplete == cacheTask)
-                _logger.LogInformation($"Decryption task '{taskId}' succeeded. Another task successfully " +
+            _logger.LogInformation(firstToComplete == decryptTask
+                ? $"Decryption task '{taskId}' succeeded. Parameters used: " +
+                    $"{nameof(maxTextLength)} = {maxTextLength}, {nameof(chars)} = '{chars}'. " +
+                    $"The {nameof(hash)} '{hash}' corresponds to '{text}'."
+                : $"Decryption task '{taskId}' succeeded. Another task successfully " +
                     $"decrypted the {nameof(hash)} '{hash}' and it corresponds to '{text}'.");
 
             return text;
+        }
+
+        private AwaiterTaskSource<string> GetAwaiter(HashAndParams hashAndParams)
+        {
+            var (hash, prm) = hashAndParams;
+            var awaiter = new AwaiterTaskSource<string>(token =>
+                DesDecryptor.DecryptAsync(hash, new BruteForceEnumerable(prm), token));
+
+            _ = awaiter.Completion.ContinueWith(t =>
+                _awaiters.TryRemove(hashAndParams, out _), TaskScheduler.Default);
+            
+            return awaiter;
         }
     }
 }
