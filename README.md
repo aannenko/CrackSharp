@@ -1,4 +1,4 @@
-[![Build](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml) [![CodeQL](https://github.com/aannenko/CrackSharp/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/codeql-analysis.yml) [![Docker](https://github.com/aannenko/CrackSharp/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/docker-publish.yml)
+[![Build](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml) [![Docker](https://github.com/aannenko/CrackSharp/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/docker-publish.yml)
 
 # CrackSharp
 Use code in this repository to build and run .NET Core applications that are able to efficiently decrypt DES hashes produced by [crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html). Decryption process is based on brute-force method.
