@@ -1,5 +1,4 @@
-﻿using System;
-using CrackSharp.Core.Common.BruteForce;
+﻿using CrackSharp.Core.Common.BruteForce;
 using CrackSharp.Core.Des;
 using CrackSharp.Core.Des.BruteForce;
 
