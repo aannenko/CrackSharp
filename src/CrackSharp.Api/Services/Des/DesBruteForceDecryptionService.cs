@@ -46,7 +46,7 @@ public class DesBruteForceDecryptionService
         _logger.LogInformation($"Starting a decryption task '{taskId}'. Parameters used: " +
             $"{nameof(maxTextLength)} = {maxTextLength}, {nameof(chars)} = '{chars}'.");
 
-        var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var cacheTask = _cache.AwaitValue(hash, linkedCts.Token);
         var decryptTask = _awaiters.GetOrAdd(new(hash, new(maxTextLength, chars)), GetAwaiter)
             .GetAwaiterTask(linkedCts.Token);
