@@ -57,7 +57,7 @@ public class DesBruteForceDecryptionService
 
         _cache.GetOrCreate(hash, cacheEntry =>
         {
-            cacheEntry.Size = text.Length;
+            cacheEntry.Size = (hash.Length + text.Length) * 2;
             return text;
         });
 
