@@ -3,14 +3,6 @@ Use code in this directory to build a .NET WebAPI service, capable of bruteforci
 
 The service also allows to calculate crypt(3)-like DES hashes from arbitrary text and, optionally, salt.
 
-### Docker Deployment
-1. Clone this repository and `cd` to its root
-2. Create a Docker image: `docker build -t crack-sharp .`
-3. Use one of the following commands:
-    - `docker run -it --rm -p 5000:5000 --name crack-sharp crack-sharp` - run a container and attach to its console, container's files will be removed once it is stopped (useful for testing/debugging)
-    - `docker run -d -p 5000:5000 --name crack-sharp crack-sharp` - run a container in detached mode
-4. Test the service by opening `<container_address>/api/v1/des/encrypt?text=test` in a browser.
-
 ### Usage
 Examples in PowerShell 7 or bash:
 ```powershell
@@ -39,6 +31,38 @@ Decryption
 Encryption
 - `text=<text_to_encrypt>` (required) - the service will encrypt first 8 characters of the specified text (see remarks below) and return encryption result. If salt is not specified by the user, it is generated automatically.
 - `salt=<encryption_salt>` (optional) - salt allows for predictable encryption results. The first two characters of a hash is its salt.
+
+### Docker
+
+#### Build image locally and run
+```powershell
+git clone https://github.com/aannenko/CrackSharp.git
+cd CrackSharp
+docker build -t crack-sharp .
+
+# run a container and attach to its console, container's files will be removed once it is stopped (useful for testing/debugging)
+docker run -it --rm -p 5000:5000 --name crack-sharp crack-sharp
+
+# -- OR --
+
+# run a container in detached mode
+docker run -d -p 5000:5000 --name crack-sharp crack-sharp
+```
+
+#### Run a pre-made image
+```powershell
+docker run -it --rm -p 5000:5000 ghcr.io/aannenko/cracksharp:master
+```
+Find "platforms" in [docker-publish.yml](https://github.com/aannenko/CrackSharp/blob/master/.github/workflows/docker-publish.yml).
+
+#### Test
+Open `<container_address>/api/v1/des/encrypt?text=test` in a browser to test encryption.
+
+#### Swagger
+```powershell
+docker run -it --rm -p 5000:5000 -e DOTNET_ENVIRONMENT=Development ghcr.io/aannenko/cracksharp:master
+```
+Open `<container_address>/swagger` in a browser to access swagger.
 
 ### Remarks
 1. Two or more decryption requests with the same trio of parameters `hash`, `maxTextLength` and `chars`, including omitted parameters with their default values, will start only one decryption task. When the decryption task is complete, all these requests will return the decrypted value or `404` if the hash could not be decrypted. Any request may be canceled during the decryption process - this will not cancel the task unless all the requests are canceled and no one is waiting for the task's completion, in which case the task is canceled.
