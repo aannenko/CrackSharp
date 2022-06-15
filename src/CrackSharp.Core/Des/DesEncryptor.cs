@@ -504,13 +504,13 @@ public static class DesEncryptor
         uint firstInt = (thirdInt ^ (thirdInt << 16)) ^ right ^ schedule[scheduleIndex + 1];
         firstInt = (firstInt >> 4) | (firstInt << 28);
         left ^= (m_SPTranslationTable[1, firstInt & 0x3F] |
-                    m_SPTranslationTable[3, (firstInt >> 8) & 0x3F] |
-                    m_SPTranslationTable[5, (firstInt >> 16) & 0x3F] |
-                    m_SPTranslationTable[7, (firstInt >> 24) & 0x3F] |
-                    m_SPTranslationTable[0, secondInt & 0x3F] |
-                    m_SPTranslationTable[2, (secondInt >> 8) & 0x3F] |
-                    m_SPTranslationTable[4, (secondInt >> 16) & 0x3F] |
-                    m_SPTranslationTable[6, (secondInt >> 24) & 0x3F]);
+                 m_SPTranslationTable[3, (firstInt >> 8) & 0x3F] |
+                 m_SPTranslationTable[5, (firstInt >> 16) & 0x3F] |
+                 m_SPTranslationTable[7, (firstInt >> 24) & 0x3F] |
+                 m_SPTranslationTable[0, secondInt & 0x3F] |
+                 m_SPTranslationTable[2, (secondInt >> 8) & 0x3F] |
+                 m_SPTranslationTable[4, (secondInt >> 16) & 0x3F] |
+                 m_SPTranslationTable[6, (secondInt >> 24) & 0x3F]);
 
         return left;
     }
