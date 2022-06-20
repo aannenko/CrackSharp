@@ -1,4 +1,3 @@
-using System;
 using CrackSharp.Core.Des.BruteForce;
 
 namespace CrackSharp.Core.Common.BruteForce
@@ -21,14 +20,13 @@ namespace CrackSharp.Core.Common.BruteForce
             private readonly IBruteForceParams _params;
             private readonly char[] _textBuffer;
             private readonly int[] _indices;
-            private int _position;
+            private int _position = 0;
 
             internal Enumerator(IBruteForceParams parameters)
             {
                 _params = parameters;
                 _textBuffer = new char[_params.MaxTextLength];
                 _indices = new int[_params.MaxTextLength];
-                _position = 0;
             }
 
             public ReadOnlySpan<char> Current => _textBuffer.AsSpan(0, _position + 1);
