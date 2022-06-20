@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using CrackSharp.Core.Common.BruteForce;
 
 namespace CrackSharp.Core.Des.BruteForce;
 

@@ -1,4 +1,4 @@
-namespace CrackSharp.Core.Des.BruteForce
+namespace CrackSharp.Core.Common.BruteForce
 {
     public interface IBruteForceParams
     {

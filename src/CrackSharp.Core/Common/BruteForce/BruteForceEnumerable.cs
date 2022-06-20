@@ -1,5 +1,3 @@
-using CrackSharp.Core.Des.BruteForce;
-
 namespace CrackSharp.Core.Common.BruteForce
 {
     public class BruteForceEnumerable : ISpanEnumerable<char>, IDescribable
