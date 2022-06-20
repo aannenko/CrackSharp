@@ -14,7 +14,7 @@ public static class DesDecryptor
             throw new ArgumentException(
                 "Value must consist of exactly 13 chars from the set [a-zA-Z0-9./].", nameof(hash));
 
-        return Task.Run(() =>
+        string Decrypt()
         {
             var salt = hash.AsSpan(0, 2);
             Span<char> hashBuffer = stackalloc char[13];
@@ -28,6 +28,8 @@ public static class DesDecryptor
 
             throw new DecryptionFailedException($"Decryption of the {nameof(hash)} '{hash}' " +
                 $"using the following {nameof(enumerable)} has failed. {enumerable.Description}");
-        }, token);
+        }
+
+        return Task.Run(Decrypt, token);
     }
 }
