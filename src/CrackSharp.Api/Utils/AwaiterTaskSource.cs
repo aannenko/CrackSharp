@@ -2,44 +2,42 @@ namespace CrackSharp.Api.Utils;
 
 public class AwaiterTaskSource<T>
 {
-    private readonly TaskCompletionSource _completion = new();
-    private readonly Lazy<Task<T>> _mainTask;
-    private readonly CancellationTokenSource? _mainTaskCts;
+    private readonly Lazy<Task<T>> _lazyTask;
+    private readonly CancellationTokenSource? _taskCts;
     private int _awaitersCount = 0;
 
     internal AwaiterTaskSource(Func<Task<T>> taskFactory)
     {
-        _mainTask = new(() => taskFactory(), true);
+        _lazyTask = new(() => taskFactory(), true);
     }
 
     internal AwaiterTaskSource(Func<CancellationToken, Task<T>> taskFactory)
     {
-        _mainTaskCts = new();
-        _mainTask = new(() => taskFactory(_mainTaskCts.Token), true);
+        _taskCts = new();
+        _lazyTask = new(() => taskFactory(_taskCts.Token), true);
     }
 
-    public Task Completion => _completion.Task;
+    public Task<T> Task => _lazyTask.Value;
 
     public async Task<T> GetAwaiterTask(CancellationToken cancellationToken = default)
     {
-        if (Completion.IsCompleted)
-            return await _mainTask.Value.ConfigureAwait(false);
+        if (Task.IsCompleted)
+            return await Task.ConfigureAwait(false);
 
         Interlocked.Increment(ref _awaitersCount);
+
         using var cancellation = new CancellationTokenTaskSource<T>(cancellationToken);
-        var mainOrCancellation = await Task.WhenAny(_mainTask.Value, cancellation.Task).ConfigureAwait(false);
+        var mainOrCancellation = await System.Threading.Tasks.Task.WhenAny(Task, cancellation.Task)
+            .ConfigureAwait(false);
+
         try
         {
             return await mainOrCancellation.ConfigureAwait(false);
         }
         finally
         {
-            if (!Completion.IsCompleted && Interlocked.Decrement(ref _awaitersCount) == 0)
-            {
-                _completion.TrySetResult();
-                if (mainOrCancellation != _mainTask.Value)
-                    _mainTaskCts?.Cancel();
-            }
+            if (Interlocked.Decrement(ref _awaitersCount) == 0 && mainOrCancellation != Task)
+                _taskCts?.Cancel();
         }
     }
 }

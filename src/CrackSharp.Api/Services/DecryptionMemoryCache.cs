@@ -22,7 +22,7 @@ public class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notn
         var awaiterTask = _awaiters.GetOrAdd(key, k =>
         {
             var awaiter = new AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>(() => tcs.Task, tcs);
-            _ = awaiter.Completion.ContinueWith(t => _awaiters.TryRemove(k, out _), TaskScheduler.Default);
+            _ = awaiter.Task.ContinueWith(t => _awaiters.TryRemove(k, out _), TaskScheduler.Default);
             return awaiter;
         }).GetAwaiterTask(cancellationToken);
 

@@ -77,7 +77,7 @@ public class DesBruteForceDecryptionService
         var awaiter = new AwaiterTaskSource<string>(token =>
             DesDecryptor.DecryptAsync(hash, new BruteForceEnumerable(prm), token));
 
-        _ = awaiter.Completion.ContinueWith(t =>
+        _ = awaiter.Task.ContinueWith(t =>
             _awaiters.TryRemove(hashAndParams, out _), TaskScheduler.Default);
 
         return awaiter;
