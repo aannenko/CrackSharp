@@ -11,15 +11,17 @@ public record DesBruteForceParams : IBruteForceParams
 
     public DesBruteForceParams(int maxTextLength, string characters = DefaultChars)
     {
-        MaxTextLength = maxTextLength > 0 && maxTextLength < 9
+        MaxTextLength = maxTextLength is > 0 and < 9
             ? maxTextLength
             : throw new ArgumentOutOfRangeException(nameof(maxTextLength), maxTextLength,
                 "Value cannot be less than 1 or greater than 8.");
 
-        Characters = _charsValidator.IsMatch(characters)
-            ? new string(characters.Distinct().ToArray())
-            : throw new ArgumentException(
-                "Value must consist of one or more chars from the set [a-zA-Z0-9./].", nameof(characters));
+        Characters = characters is DefaultChars
+            ? characters
+            : _charsValidator.IsMatch(characters)
+                ? new string(characters.Distinct().ToArray())
+                : throw new ArgumentException(
+                    "Value must consist of one or more chars from the set [a-zA-Z0-9./].", nameof(characters));
     }
 
     public int MaxTextLength { get; }
