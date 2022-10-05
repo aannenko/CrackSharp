@@ -22,7 +22,7 @@ public static class DesDecryptor
             {
                 token.ThrowIfCancellationRequested();
                 DesEncryptor.Encrypt(text, salt, hashBuffer);
-                if (MemoryExtensions.Equals(hash, hashBuffer, StringComparison.Ordinal))
+                if (hashBuffer.SequenceEqual(hash))
                     return text.ToString();
             }
 
