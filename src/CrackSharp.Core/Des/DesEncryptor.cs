@@ -345,14 +345,9 @@ public static class DesEncryptor
 
     public static void Encrypt(ReadOnlySpan<char> textToEncrypt, Span<char> outputBuffer)
     {
-        int maxGeneratedNumber = m_encryptionSaltCharacters.Length;
-        int randomIndex;
         Span<char> encryptionSalt = stackalloc char[2];
-        for (int index = 0; index < 2; index++)
-        {
-            randomIndex = _random.Next(maxGeneratedNumber);
-            encryptionSalt[index] = m_encryptionSaltCharacters[randomIndex];
-        }
+        for (int i = 0; i < 2; i++)
+            encryptionSalt[i] = m_encryptionSaltCharacters[_random.Next(m_encryptionSaltCharacters.Length)];
 
         Encrypt(textToEncrypt, encryptionSalt, outputBuffer);
     }
