@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace CrackSharp.Api.Services;
 
-public class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
+public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
 {
     private readonly IMemoryCache _cache;
 
@@ -36,13 +36,13 @@ public class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notn
     {
         var value = _cache.GetOrCreate(key, factory);
         if (_awaiters.TryGetValue(key, out var awaiter))
-            awaiter.State.TrySetResult(value);
+            awaiter.State.TrySetResult(value!);
 
-        return value;
+        return value!;
     }
 
     public bool TryGetValue(TKey key, out TValue value) =>
-        _cache.TryGetValue(key, out value);
+        _cache.TryGetValue(key, out value!);
 
     public void Remove(TKey key) =>
         _cache.Remove(key);
