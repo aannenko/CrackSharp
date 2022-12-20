@@ -5,13 +5,18 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '7.x'
+
     - name: Build command line app
       run: dotnet build src/CrackSharp.Cmd --configuration Release
+
     - name: Build WebAPI app
       run: dotnet build src/CrackSharp.Api --configuration Release
