@@ -2,22 +2,13 @@ namespace CrackSharp.Api.Utils;
 
 public class AwaiterTaskSource<T>
 {
-    private readonly Lazy<Task<T>> _lazyTask;
-    private readonly CancellationTokenSource? _taskCts;
+    private readonly CancellationTokenSource _taskCts = new();
     private int _awaitersCount = 0;
 
-    internal AwaiterTaskSource(Func<Task<T>> taskFactory)
-    {
-        _lazyTask = new(() => taskFactory(), true);
-    }
+    internal AwaiterTaskSource(Func<CancellationToken, Task<T>> taskFactory) =>
+        Task = taskFactory(_taskCts.Token);
 
-    internal AwaiterTaskSource(Func<CancellationToken, Task<T>> taskFactory)
-    {
-        _taskCts = new();
-        _lazyTask = new(() => taskFactory(_taskCts.Token), true);
-    }
-
-    public Task<T> Task => _lazyTask.Value;
+    public Task<T> Task { get; }
 
     public async Task<T> GetAwaiterTask(CancellationToken cancellationToken = default)
     {
@@ -37,22 +28,15 @@ public class AwaiterTaskSource<T>
         finally
         {
             if (Interlocked.Decrement(ref _awaitersCount) == 0 && mainOrCancellation != Task)
-                _taskCts?.Cancel();
+                _taskCts.Cancel();
         }
     }
 }
 
 public class AwaiterTaskSource<T, K> : AwaiterTaskSource<T>
 {
-    internal AwaiterTaskSource(Func<Task<T>> taskFactory, K state) : base(taskFactory)
-    {
+    internal AwaiterTaskSource(Func<CancellationToken, Task<T>> taskFactory, K state) : base(taskFactory) =>
         State = state;
-    }
-
-    internal AwaiterTaskSource(Func<CancellationToken, Task<T>> taskFactory, K state) : base(taskFactory)
-    {
-        State = state;
-    }
 
     public K State { get; init; }
 }

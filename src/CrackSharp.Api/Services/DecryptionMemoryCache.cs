@@ -18,18 +18,30 @@ public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey
 
     public Task<TValue> AwaitValue(TKey key, CancellationToken cancellationToken)
     {
-        var tcs = new TaskCompletionSource<TValue>();
-        var awaiterTask = _awaiters.GetOrAdd(key, k =>
+        static async Task<T> GetCancellableTcsTask<T>(TaskCompletionSource<T> tcs, CancellationToken cancellationToken)
         {
-            var awaiter = new AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>(() => tcs.Task, tcs);
-            _ = awaiter.Task.ContinueWith(t => _awaiters.TryRemove(k, out _), TaskScheduler.Default);
+            using (cancellationToken.UnsafeRegister((tcs, token) =>
+                ((TaskCompletionSource<T>)tcs!).TrySetCanceled(token), tcs))
+                    return await tcs.Task;
+        }
+
+        var awaiter = _awaiters.GetOrAdd(key, key =>
+        {
+            var tcs = new TaskCompletionSource<TValue>();
+            var awaiter = new AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>(ct =>
+                GetCancellableTcsTask(tcs, ct), tcs);
+
+            _ = awaiter.Task.ContinueWith(t =>
+            {
+                _awaiters.TryRemove(key, out _);
+            }, TaskScheduler.Default);
             return awaiter;
-        }).GetAwaiterTask(cancellationToken);
+        });
 
         if (TryGetValue(key, out var value))
-            tcs.SetResult(value);
+            awaiter.State.TrySetResult(value);
 
-        return awaiterTask;
+        return awaiter.GetAwaiterTask(cancellationToken);
     }
 
     public TValue GetOrCreate(TKey key, Func<ICacheEntry, TValue> factory)

@@ -6,8 +6,9 @@ namespace CrackSharp.Core.Des.BruteForce;
 public record DesBruteForceParams : IBruteForceParams
 {
     private const string DefaultChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
+    private const string AllowedChars = "[a-zA-Z0-9./]";
 
-    private static readonly Regex _charsValidator = new Regex("^[a-zA-Z0-9./]+$", RegexOptions.Compiled);
+    private static readonly Regex _charsValidator = new Regex($"^{AllowedChars}+$", RegexOptions.Compiled);
 
     public DesBruteForceParams(int maxTextLength, string characters = DefaultChars)
     {
@@ -21,7 +22,7 @@ public record DesBruteForceParams : IBruteForceParams
             : _charsValidator.IsMatch(characters)
                 ? new string(characters.Distinct().ToArray())
                 : throw new ArgumentException(
-                    "Value must consist of one or more chars from the set [a-zA-Z0-9./].", nameof(characters));
+                    $"Value must consist of one or more chars from the set {AllowedChars}.", nameof(characters));
     }
 
     public int MaxTextLength { get; }

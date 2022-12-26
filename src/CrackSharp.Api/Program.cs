@@ -3,7 +3,7 @@ using CrackSharp.Api.Services.Des;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMemoryCache(mc => mc.SizeLimit =
+builder.Services.AddMemoryCache(options => options.SizeLimit =
     builder.Configuration.GetValue("Decryption:CacheSizeBytes", 52_428_800 /* 50 MB */));
 
 builder.Services.AddSingleton(typeof(DecryptionMemoryCache<,>));

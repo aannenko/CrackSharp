@@ -25,13 +25,16 @@ public class DesBruteForceDecryptionService
     public ValueTask<string> DecryptAsync(string hash, int maxTextLength, string chars,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"Decryption of a {nameof(hash)} '{hash}' with " +
-            $"{nameof(maxTextLength)} = {maxTextLength} and {nameof(chars)} = '{chars}' requested.");
+        _logger.LogInformation(
+            "Decryption of a {HashParam} '{Hash}' with {MaxTextLengthParam} = {MaxTextLength} " +
+            "and {CharsParam} = '{Chars}' requested.",
+            nameof(hash), hash, nameof(maxTextLength), maxTextLength, nameof(chars), chars);
 
         if (_cache.TryGetValue(hash, out var text))
         {
-            _logger.LogInformation($"Decrypted value of the {nameof(hash)} '{hash}' " +
-                $"was found in cache; the value is '{text}'.");
+            _logger.LogInformation(
+                "Decrypted value of the {HashParam} '{Hash}' was found in cache; the value is '{Text}'.",
+                nameof(hash), hash, text);
 
             return new ValueTask<string>(text);
         }
@@ -42,9 +45,11 @@ public class DesBruteForceDecryptionService
     private async Task<string> StartDecryptionAsync(string hash, int maxTextLength, string chars,
         CancellationToken cancellationToken)
     {
-        var taskId = $"{hash} - {DateTime.UtcNow.ToString("o")}";
-        _logger.LogInformation($"Starting a decryption task '{taskId}'. Parameters used: " +
-            $"{nameof(maxTextLength)} = {maxTextLength}, {nameof(chars)} = '{chars}'.");
+        var taskId = $"{hash} - {DateTime.UtcNow:o}";
+        _logger.LogInformation(
+            "Starting a decryption task '{TaskId}'. Parameters used: " +
+            "{MaxTextLengthParam} = {MaxTextLength}, {CharsParam} = '{Chars}'.",
+            taskId, nameof(maxTextLength), maxTextLength, nameof(chars), chars);
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var cacheTask = _cache.AwaitValue(hash, linkedCts.Token);
@@ -61,12 +66,16 @@ public class DesBruteForceDecryptionService
             return text;
         });
 
-        _logger.LogInformation(firstToComplete == decryptTask
-            ? $"Decryption task '{taskId}' succeeded. Parameters used: " +
-                $"{nameof(maxTextLength)} = {maxTextLength}, {nameof(chars)} = '{chars}'. " +
-                $"The {nameof(hash)} '{hash}' corresponds to '{text}'."
-            : $"Decryption task '{taskId}' succeeded. Another task successfully " +
-                $"decrypted the {nameof(hash)} '{hash}' and it corresponds to '{text}'.");
+        if (firstToComplete == decryptTask)
+            _logger.LogInformation(
+                "Decryption task '{TaskId}' succeeded. Parameters used: {MaxTextLengthParam} = {MaxTextLength}, " +
+                "{CharsParam} = '{Chars}'. The {HashParam} '{Hash}' corresponds to '{Text}'.",
+                taskId, nameof(maxTextLength), maxTextLength, nameof(chars), chars, nameof(hash), hash, text);
+        else
+            _logger.LogInformation(
+                "Decryption task '{TaskId}' succeeded. Another task successfully " +
+                "decrypted the {HashParam} '{Hash}' and it corresponds to '{Text}'.",
+                taskId, nameof(hash), hash, text);
 
         return text;
     }
