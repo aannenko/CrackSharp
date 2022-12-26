@@ -32,9 +32,9 @@ public class DesController : ControllerBase
         [Range(1, 8)] int maxTextLength = 8,
         [RegularExpression("^[a-zA-Z0-9./]+$")] string? chars = DefaultChars)
     {
-        var logMessage = $"Decryption of the {nameof(hash)} '{hash}' " +
-            $"with {nameof(maxTextLength)} = {maxTextLength} " +
-            $"and {nameof(chars)} = '{chars}'";
+        const string DecryptLogMessage =
+            "Decryption of the {HashParam} '{Hash}' with {MaxTextLengthParam} = {MaxTextLength} " +
+            "and {CharsParam} = '{Chars}'";
 
         try
         {
@@ -43,17 +43,23 @@ public class DesController : ControllerBase
         }
         catch (DecryptionFailedException e)
         {
-            _logger.LogError($"{logMessage} failed: {e.Message}");
+            _logger.LogInformation(e, $"{DecryptLogMessage} failed.",
+                nameof(hash), hash, nameof(maxTextLength), maxTextLength, nameof(chars), chars);
+
             return NotFound();
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException e)
         {
-            _logger.LogWarning($"{logMessage} canceled.");
+            _logger.LogInformation(e, $"{DecryptLogMessage} canceled.",
+                nameof(hash), hash, nameof(maxTextLength), maxTextLength, nameof(chars), chars);
+
             return StatusCode(StatusCodes.Status408RequestTimeout);
         }
         catch (Exception e)
         {
-            _logger.LogError($"{logMessage} failed: {e.Message}{Environment.NewLine}{e.StackTrace}");
+            _logger.LogError(e, $"{DecryptLogMessage} failed.",
+                nameof(hash), hash, nameof(maxTextLength), maxTextLength, nameof(chars), chars);
+
             throw;
         }
     }
@@ -68,8 +74,8 @@ public class DesController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError($"Encryption of the {nameof(text)} '{text}' with " +
-                $"{nameof(salt)} '{salt}' failed: {e.Message}{Environment.NewLine}{e.StackTrace}");
+            _logger.LogError(e, "Encryption of the {TextParam} '{Text}' with {SaltParam} '{Salt}' failed.",
+                nameof(text), text, nameof(salt), salt);
 
             throw;
         }
