@@ -13,7 +13,7 @@ namespace CrackSharp.Core.Common.BruteForce
 
         public ISpanEnumerator<char> GetEnumerator() => new Enumerator(_params);
 
-        public struct Enumerator : ISpanEnumerator<char>
+        private class Enumerator : ISpanEnumerator<char>
         {
             private readonly IBruteForceParams _params;
             private readonly char[] _textBuffer;
