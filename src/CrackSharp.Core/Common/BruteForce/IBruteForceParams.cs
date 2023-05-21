@@ -1,9 +1,8 @@
-namespace CrackSharp.Core.Common.BruteForce
-{
-    public interface IBruteForceParams
-    {
-        int MaxTextLength { get; }
+namespace CrackSharp.Core.Common.BruteForce;
 
-        string Characters { get; }
-    }
+public interface IBruteForceParams
+{
+    int MaxTextLength { get; }
+
+    string Characters { get; }
 }

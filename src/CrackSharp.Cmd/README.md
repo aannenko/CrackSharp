@@ -8,7 +8,7 @@ MaxTextLength = 5; // the app will only guess words up to 5 characters long
 Chars = "abcXYZ"; // the app will only build words from these characters
 ```
 ### Usage
-You will need [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) installed.
+You will need [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) installed.
 
 Example in PowerShell/bash:
 ```powershell

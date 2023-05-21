@@ -13,7 +13,8 @@ if (args.Length != 1)
 
 try
 {
-    Console.WriteLine(await DesDecryptor.DecryptAsync(args[0],
+    Console.WriteLine(await DesDecryptor.DecryptAsync(
+        args[0],
         new BruteForceEnumerable(new DesBruteForceParams(MaxTextLength, Chars))));
 
     return 0;

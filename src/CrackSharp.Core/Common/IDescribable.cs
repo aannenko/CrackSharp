@@ -1,7 +1,6 @@
-namespace CrackSharp.Core.Common
+namespace CrackSharp.Core.Common;
+
+public interface IDescribable
 {
-    public interface IDescribable
-    {
-        string Description { get; }
-    }
+    string Description { get; }
 }

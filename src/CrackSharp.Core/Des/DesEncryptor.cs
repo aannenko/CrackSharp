@@ -27,7 +27,14 @@ public static class DesEncryptor
         0x3D, 0x3E, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00
     };
 
-    private static readonly bool[] m_shifts =
+    // Optimization: remove array allocation
+    //
+    // When the compiler sees a byte[] (or sbyte[] or bool[]) being initialized
+    // with a constant length and constant values and immediately cast to or
+    // used to construct a ReadOnlySpan<byte>, it optimizes away the byte[] allocation.
+    // Instead, it blits the data for that span into the assembly’s data section,
+    // and then constructs a span that points directly to that data in the loaded assembly.
+    private static ReadOnlySpan<bool> m_shifts => new[]
     {
         false, false, true, true, true, true, true, true,
         false, true, true, true, true, true, true, false
@@ -341,7 +348,7 @@ public static class DesEncryptor
         0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A
     };
 
-    private static readonly Random _random = new Random();
+    private static readonly Random _random = new();
 
     public static void Encrypt(ReadOnlySpan<char> textToEncrypt, Span<char> outputBuffer)
     {
@@ -361,7 +368,8 @@ public static class DesEncryptor
             throw new ArgumentException("Output buffer must be 13 characters long.", nameof(outputBuffer));
 
         Span<byte> encryptionKey = stackalloc byte[8];
-        for (int index = 0; index < textToEncrypt.Length && index < encryptionKey.Length; index++)
+        var minLength = Math.Min(textToEncrypt.Length, encryptionKey.Length);
+        for (int index = 0; index < minLength; index++)
             encryptionKey[index] = (byte)(Convert.ToInt32(textToEncrypt[index]) << 1);
 
         Span<uint> schedule = stackalloc uint[m_desIterations * 2];
@@ -435,14 +443,14 @@ public static class DesEncryptor
             firstInt &= 0x0FFFFFFF;
             secondInt &= 0xFFFFFFF;
             uint firstSkbValue = m_skb[0, firstInt & 0x3F] |
-                                    m_skb[1, ((firstInt >> 6) & 0x03) | ((firstInt >> 7) & 0x3C)] |
-                                    m_skb[2, ((firstInt >> 13) & 0x0F) | ((firstInt >> 14) & 0x30)] |
-                                    m_skb[3, ((firstInt >> 20) & 0x01) | ((firstInt >> 21) & 0x06) | ((firstInt >> 22) & 0x38)];
+                                 m_skb[1, ((firstInt >> 6) & 0x03) | ((firstInt >> 7) & 0x3C)] |
+                                 m_skb[2, ((firstInt >> 13) & 0x0F) | ((firstInt >> 14) & 0x30)] |
+                                 m_skb[3, ((firstInt >> 20) & 0x01) | ((firstInt >> 21) & 0x06) | ((firstInt >> 22) & 0x38)];
 
             uint secondSkbValue = m_skb[4, secondInt & 0x3F] |
-                                    m_skb[5, ((secondInt >> 7) & 0x03) | ((secondInt >> 8) & 0x3C)] |
-                                    m_skb[6, (secondInt >> 15) & 0x3F] |
-                                    m_skb[7, ((secondInt >> 21) & 0x0F) | ((secondInt >> 22) & 0x30)];
+                                  m_skb[5, ((secondInt >> 7) & 0x03) | ((secondInt >> 8) & 0x3C)] |
+                                  m_skb[6, (secondInt >> 15) & 0x3F] |
+                                  m_skb[7, ((secondInt >> 21) & 0x0F) | ((secondInt >> 22) & 0x30)];
 
             schedule[scheduleIndex++] = ((secondSkbValue << 16) | (firstSkbValue & 0xFFFF)) & 0xFFFFFFFF;
             firstSkbValue = ((firstSkbValue >> 16) | (secondSkbValue & 0xFFFF0000));
@@ -494,7 +502,7 @@ public static class DesEncryptor
     {
         uint thirdInt = right ^ (right >> 16);
         uint secondInt = thirdInt & firstSaltTranslator;
-        thirdInt = thirdInt & secondSaltTranslator;
+        thirdInt &= secondSaltTranslator;
         secondInt = (secondInt ^ (secondInt << 16)) ^ right ^ schedule[scheduleIndex];
         uint firstInt = (thirdInt ^ (thirdInt << 16)) ^ right ^ schedule[scheduleIndex + 1];
         firstInt = (firstInt >> 4) | (firstInt << 28);
