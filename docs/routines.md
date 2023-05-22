@@ -3,3 +3,4 @@
 - update .NET version in `.github/workflows/dotnetcore.yml`
 - update .NET version in `.github/workflows/docker-publish.yml`
 - update .NET version in `Dockerfile`
+- update all `README.md`

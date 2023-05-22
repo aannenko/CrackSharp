@@ -31,10 +31,7 @@ public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey
             var awaiter = new AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>(ct =>
                 GetCancellableTcsTask(tcs, ct), tcs);
 
-            _ = awaiter.Task.ContinueWith(t =>
-            {
-                _awaiters.TryRemove(key, out _);
-            }, TaskScheduler.Default);
+            awaiter.Task.ContinueWith(t => _awaiters.TryRemove(key, out _), TaskScheduler.Default);
             return awaiter;
         });
 

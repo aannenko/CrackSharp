@@ -33,10 +33,10 @@ public class AwaiterTaskSource<T>
     }
 }
 
-public class AwaiterTaskSource<T, K> : AwaiterTaskSource<T>
+public sealed class AwaiterTaskSource<T, K> : AwaiterTaskSource<T>
 {
     internal AwaiterTaskSource(Func<CancellationToken, Task<T>> taskFactory, K state) : base(taskFactory) =>
         State = state;
 
-    public K State { get; init; }
+    public K State { get; }
 }

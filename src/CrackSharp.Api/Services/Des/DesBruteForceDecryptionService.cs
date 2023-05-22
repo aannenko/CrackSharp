@@ -60,11 +60,7 @@ public class DesBruteForceDecryptionService
         linkedCts.Cancel();
         var text = await firstToComplete;
 
-        _cache.GetOrCreate(hash, cacheEntry =>
-        {
-            cacheEntry.Size = (hash.Length + text.Length) * 2;
-            return text;
-        });
+        _cache.GetOrCreate(hash, text);
 
         if (firstToComplete == decryptTask)
             _logger.LogInformation(
@@ -86,7 +82,7 @@ public class DesBruteForceDecryptionService
         var awaiter = new AwaiterTaskSource<string>(token =>
             DesDecryptor.DecryptAsync(hash, new BruteForceEnumerable(prm), token));
 
-        _ = awaiter.Task.ContinueWith(t =>
+        awaiter.Task.ContinueWith(t =>
             _awaiters.TryRemove(hashAndParams, out _), TaskScheduler.Default);
 
         return awaiter;

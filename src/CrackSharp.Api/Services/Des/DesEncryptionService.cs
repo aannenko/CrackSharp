@@ -20,24 +20,23 @@ public class DesEncryptionService
         var isSaltEmpty = string.IsNullOrWhiteSpace(salt);
         var saltDescription = isSaltEmpty ? $"empty {nameof(salt)}" : $"{nameof(salt)} '{salt}'";
 
-        _logger.LogInformation($"Encryption of {nameof(text)} '{text}' with {saltDescription} requested.");
+        _logger.LogInformation(
+            "Encryption of {TextParam} '{Text}' with {SaltDescription} requested.",
+            nameof(text), text, saltDescription);
 
+        var trimmedText = text.Length <= 8 ? text : text[..8];
         Span<char> hashBuffer = stackalloc char[13];
         if (isSaltEmpty)
-            DesEncryptor.Encrypt(text, hashBuffer);
+            DesEncryptor.Encrypt(trimmedText, hashBuffer);
         else
-            DesEncryptor.Encrypt(text, salt, hashBuffer);
+            DesEncryptor.Encrypt(trimmedText, salt, hashBuffer);
 
         var hash = hashBuffer.ToString();
-        _cache.GetOrCreate(hash, cacheEntry =>
-        {
-            var trimmedText = text.Length <= 8 ? text : text.Substring(0, 8);
-            cacheEntry.Size = trimmedText.Length;
-            return trimmedText;
-        });
+        _cache.GetOrCreate(hash, trimmedText);
 
-        _logger.LogInformation($"Encryption of {nameof(text)} '{text}' with {saltDescription} succeeded. " +
-            $"Encrypted value is '{hash}'.");
+        _logger.LogInformation(
+            "Encryption of {TextParam} '{Text}' with {SaltDescription} succeeded. Encrypted value is '{Hash}'.",
+            nameof(text), text, saltDescription, hash);
 
         return hash;
     }

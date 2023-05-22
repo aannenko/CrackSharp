@@ -3,3 +3,4 @@
 src/CrackSharp*/bin
 src/CrackSharp*/obj
 /src/CrackSharp.Cmd/Properties/launchSettings.json
+*.csproj.user
