@@ -7,6 +7,7 @@ The first two constants in `Program.cs` have the following meaning:
 MaxTextLength = 5; // the app will only guess words up to 5 characters long
 Chars = "abcXYZ"; // the app will only build words from these characters
 ```
+
 ### Usage
 You will need [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) installed.
 
@@ -21,3 +22,8 @@ cd ./out
 ./crack 50cI2vYkF0YU2
 ```
 Output: `LOL`
+
+### Remarks
+The application is quite efficient in terms of heap allocation: once it reaches a steady state and starts the decryption process, it becomes allocation-free.
+
+<img width="947" alt="Screenshot 2023-05-21 180448" src="https://github.com/aannenko/CrackSharp/assets/4640265/36a322c0-d855-43db-bf9c-c83cc60fd630">
