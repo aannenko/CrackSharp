@@ -65,4 +65,4 @@ jobs:
         with:
           push: ${{ github.event_name != 'pull_request' }}
           # GITHUB_REF_NAME is a short branch name, e.g. "master"
-          tags: ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
