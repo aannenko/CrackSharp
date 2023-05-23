@@ -3,7 +3,7 @@
 # CrackSharp
 Use code in this repository to build and run .NET applications that are able to efficiently decrypt DES hashes produced by [crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html). Decryption process is based on brute-force method.
 
-High decryption speed is achieved by heavy usage of stack-allocated [`Span<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.span-1) and [`ReadOnlySpan<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.readonlyspan-1), heap allocation during decryption is kept to a minimum.
+High decryption speed is achieved by heavy usage of stack-allocated [`Span<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.span-1) and [`ReadOnlySpan<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.readonlyspan-1), there is no heap allocation during decryption.
 
 ### Contents
 The repository contains source code for three projects:
