@@ -62,4 +62,4 @@ jobs:
         with:
           push: ${{ github.event_name != 'pull_request' }}
           # GITHUB_REPOSITORY resolves to "aannenko/CrackSharp"; GITHUB_REF_NAME is a short branch name, e.g. "master"
-          tags: ${{ GITHUB_REPOSITORY }}:${{ GITHUB_REF_NAME }}
+          tags: ${{ github.repository }}:${{ github.ref_name }}
