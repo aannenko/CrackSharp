@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackSharp.Api", "CrackSharp.Api.csproj", "{E171F41D-9824-4DD5-8D16-B7C36BF21FEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackSharp.Api", "CrackSharp.Api\CrackSharp.Api.csproj", "{E171F41D-9824-4DD5-8D16-B7C36BF21FEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackSharp.Core", "..\CrackSharp.Core\CrackSharp.Core.csproj", "{FD8C0109-9590-4BDA-BB8E-9AD044856868}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackSharp.Core", "CrackSharp.Core\CrackSharp.Core.csproj", "{FD8C0109-9590-4BDA-BB8E-9AD044856868}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
