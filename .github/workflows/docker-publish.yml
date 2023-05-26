@@ -63,6 +63,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
+          file: ./src/CrackSharp.Api/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           # GITHUB_REF_NAME is a short branch name, e.g. "master"
