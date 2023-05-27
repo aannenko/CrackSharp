@@ -423,8 +423,8 @@ public static class DesEncryptor
         secondInt = operationResults[1];
         PermOperation(secondInt, firstInt, 1, 0x55555555, operationResults);
         firstInt = operationResults[1] & 0x0FFFFFFF;
-        secondInt = (((operationResults[0] & 0xFF) << 16) | (operationResults[0] & 0xFF00) |
-                        ((operationResults[0] & 0xFF0000) >> 16) | ((operationResults[1] & 0xF0000000) >> 4));
+        secondInt = ((operationResults[0] & 0xFF) << 16) | (operationResults[0] & 0xFF00) |
+                    ((operationResults[0] & 0xFF0000) >> 16) | ((operationResults[1] & 0xF0000000) >> 4);
 
         int scheduleIndex = 0;
         for (int index = 0; index < m_desIterations; index++)
@@ -453,7 +453,7 @@ public static class DesEncryptor
                                   m_skb[7, ((secondInt >> 21) & 0x0F) | ((secondInt >> 22) & 0x30)];
 
             schedule[scheduleIndex++] = ((secondSkbValue << 16) | (firstSkbValue & 0xFFFF)) & 0xFFFFFFFF;
-            firstSkbValue = ((firstSkbValue >> 16) | (secondSkbValue & 0xFFFF0000));
+            firstSkbValue = (firstSkbValue >> 16) | (secondSkbValue & 0xFFFF0000);
             firstSkbValue = (firstSkbValue << 4) | (firstSkbValue >> 28);
             schedule[scheduleIndex++] = firstSkbValue & 0xFFFFFFFF;
         }
@@ -503,17 +503,17 @@ public static class DesEncryptor
         uint thirdInt = right ^ (right >> 16);
         uint secondInt = thirdInt & firstSaltTranslator;
         thirdInt &= secondSaltTranslator;
-        secondInt = (secondInt ^ (secondInt << 16)) ^ right ^ schedule[scheduleIndex];
-        uint firstInt = (thirdInt ^ (thirdInt << 16)) ^ right ^ schedule[scheduleIndex + 1];
+        secondInt = secondInt ^ (secondInt << 16) ^ right ^ schedule[scheduleIndex];
+        uint firstInt = thirdInt ^ (thirdInt << 16) ^ right ^ schedule[scheduleIndex + 1];
         firstInt = (firstInt >> 4) | (firstInt << 28);
-        left ^= (m_SPTranslationTable[1, firstInt & 0x3F] |
-                 m_SPTranslationTable[3, (firstInt >> 8) & 0x3F] |
-                 m_SPTranslationTable[5, (firstInt >> 16) & 0x3F] |
-                 m_SPTranslationTable[7, (firstInt >> 24) & 0x3F] |
-                 m_SPTranslationTable[0, secondInt & 0x3F] |
-                 m_SPTranslationTable[2, (secondInt >> 8) & 0x3F] |
-                 m_SPTranslationTable[4, (secondInt >> 16) & 0x3F] |
-                 m_SPTranslationTable[6, (secondInt >> 24) & 0x3F]);
+        left ^= m_SPTranslationTable[1, firstInt & 0x3F] |
+                m_SPTranslationTable[3, (firstInt >> 8) & 0x3F] |
+                m_SPTranslationTable[5, (firstInt >> 16) & 0x3F] |
+                m_SPTranslationTable[7, (firstInt >> 24) & 0x3F] |
+                m_SPTranslationTable[0, secondInt & 0x3F] |
+                m_SPTranslationTable[2, (secondInt >> 8) & 0x3F] |
+                m_SPTranslationTable[4, (secondInt >> 16) & 0x3F] |
+                m_SPTranslationTable[6, (secondInt >> 24) & 0x3F];
 
         return left;
     }
@@ -521,7 +521,7 @@ public static class DesEncryptor
     private static uint FourBytesToInt(Span<byte> inputBytes, int offset)
     {
         int resultValue;
-        resultValue = (inputBytes[offset++] & 0xFF);
+        resultValue = inputBytes[offset++] & 0xFF;
         resultValue |= (inputBytes[offset++] & 0xFF) << 8;
         resultValue |= (inputBytes[offset++] & 0xFF) << 16;
         resultValue |= (inputBytes[offset] & 0xFF) << 24;

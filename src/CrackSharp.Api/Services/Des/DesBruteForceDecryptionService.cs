@@ -8,7 +8,7 @@ namespace CrackSharp.Api.Services.Des;
 
 public class DesBruteForceDecryptionService
 {
-    private sealed record HashAndParams(string Hash, DesBruteForceParams Parameters);
+    private readonly record struct HashAndParams(string Hash, DesBruteForceParams Parameters);
 
     private readonly ConcurrentDictionary<HashAndParams, AwaiterTaskSource<string>> _awaiters = new();
     private readonly ILogger<DesBruteForceDecryptionService> _logger;
