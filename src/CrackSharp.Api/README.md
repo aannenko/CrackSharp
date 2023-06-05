@@ -41,17 +41,17 @@ cd CrackSharp
 docker build -t crack-sharp .
 
 # run a container and attach to its console, container's files will be removed once it is stopped (useful for testing/debugging)
-docker run -it --rm -p 5000:5000 --name crack-sharp crack-sharp
+docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 --name crack-sharp crack-sharp
 
 # -- OR --
 
 # run a container in detached mode
-docker run -d -p 5000:5000 --name crack-sharp crack-sharp
+docker run -d -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 --name crack-sharp crack-sharp
 ```
 
 #### Run a pre-made image
 ```powershell
-docker run -it --rm -p 5000:5000 ghcr.io/aannenko/cracksharp:master
+docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:master
 ```
 Find "platforms" in [docker-publish.yml](https://github.com/aannenko/CrackSharp/blob/master/.github/workflows/docker-publish.yml).
 
@@ -60,7 +60,7 @@ Open `<container_address>/api/v1/des/encrypt?text=test` in a browser to test enc
 
 #### Swagger
 ```powershell
-docker run -it --rm -p 5000:5000 -e DOTNET_ENVIRONMENT=Development ghcr.io/aannenko/cracksharp:master
+docker run -it --rm -p 5000:5000 -e DOTNET_ENVIRONMENT=Development -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:master
 ```
 Open `<container_address>/swagger` in a browser to access swagger.
 
