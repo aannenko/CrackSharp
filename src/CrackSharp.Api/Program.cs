@@ -1,22 +1,23 @@
+using CrackSharp.Api;
+using CrackSharp.Api.Endpoints;
 using CrackSharp.Api.Services;
 using CrackSharp.Api.Services.Des;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMemoryCache(options => options.SizeLimit =
-    builder.Configuration.GetValue("Decryption:CacheSizeBytes", 52_428_800 /* 50 MB */));
-
+// Add services to the container.
+builder.Services.AddMemoryCache(options => options.SizeLimit = builder.Configuration.GetCacheSizeLimit());
 builder.Services.AddSingleton(typeof(DecryptionMemoryCache<,>));
 builder.Services.AddSingleton<DesBruteForceDecryptionService>();
 builder.Services.AddSingleton<DesEncryptionService>();
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -24,6 +25,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapControllers();
+
+DesEndpoints.Map(app);
 
 app.Run();

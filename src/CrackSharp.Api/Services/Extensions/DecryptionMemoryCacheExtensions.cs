@@ -1,6 +1,4 @@
-﻿using CrackSharp.Api.Services;
-
-namespace CrackSharp.Api;
+﻿namespace CrackSharp.Api.Services;
 
 public static class DecryptionMemoryCacheExtensions
 {

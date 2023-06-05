@@ -11,13 +11,11 @@ public sealed record DesBruteForceParams : IBruteForceParams
             : throw new ArgumentOutOfRangeException(nameof(maxTextLength), maxTextLength,
                 "Value cannot be less than 1 or greater than 8.");
 
-        Characters = characters is DesConstants.AllowedChars
-            ? characters
-            : DesUtils.GetCharsValidator().IsMatch(characters)
-                ? new string(characters.Distinct().ToArray())
-                : throw new ArgumentException(
-                    $"Value must consist of one or more chars from the set {DesConstants.AllowedCharsPattern}.",
-                    nameof(characters));
+        Characters = characters is not null && DesValidationUtils.GetCharsValidator().IsMatch(characters)
+            ? new string(characters.Distinct().ToArray())
+            : throw new ArgumentException(
+                $"Value must consist of one or more chars from the set {DesConstants.AllowedCharsPattern}",
+                nameof(characters));
     }
 
     public int MaxTextLength { get; }
