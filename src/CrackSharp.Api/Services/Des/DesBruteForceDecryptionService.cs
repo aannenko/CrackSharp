@@ -6,7 +6,7 @@ using CrackSharp.Core.Des.BruteForce;
 
 namespace CrackSharp.Api.Services.Des;
 
-public class DesBruteForceDecryptionService
+public sealed class DesBruteForceDecryptionService
 {
     private readonly record struct HashAndParams(string Hash, DesBruteForceParams Parameters);
 

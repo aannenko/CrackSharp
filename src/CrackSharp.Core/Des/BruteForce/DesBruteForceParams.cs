@@ -6,10 +6,10 @@ public sealed record DesBruteForceParams : IBruteForceParams
 {
     public DesBruteForceParams(int maxTextLength, string characters = DesConstants.AllowedChars)
     {
-        MaxTextLength = maxTextLength is > 0 and < 9
+        MaxTextLength = DesValidationUtils.IsMaxTextLengthValid(maxTextLength)
             ? maxTextLength
             : throw new ArgumentOutOfRangeException(nameof(maxTextLength), maxTextLength,
-                "Value cannot be less than 1 or greater than 8.");
+                "Value must be greater than 0 and less than 9.");
 
         Characters = characters is not null && DesValidationUtils.GetCharsValidator().IsMatch(characters)
             ? new string(characters.Distinct().ToArray())

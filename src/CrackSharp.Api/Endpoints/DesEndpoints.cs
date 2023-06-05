@@ -1,25 +1,14 @@
-﻿using CrackSharp.Api.Services.Des;
+﻿using CrackSharp.Api.Endpoints.Validation;
+using CrackSharp.Api.Services.Des;
 using CrackSharp.Core;
-using CrackSharp.Core.Des;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Endpoints;
 
 public sealed class DesEndpoints
 {
     private const string DefaultChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private const string MaxTextLengthValidationMessage = "Value must be greater than 0 and less than 9.";
-    
-    private static readonly string HashValidationMessage =
-        $"Value must follow pattern {DesValidationUtils.GetHashValidator()}";
-
-    private static readonly string SaltValidationMessage =
-        $"Value must follow pattern {DesValidationUtils.GetSaltValidator()}";
-
-    private static readonly string CharsValidationMessage =
-        $"Value must follow pattern {DesValidationUtils.GetCharsValidator()}";
 
     public static void Map(WebApplication app)
     {
@@ -36,7 +25,7 @@ public sealed class DesEndpoints
         [RegularExpression("^[./0-9A-Za-z]+$")] string? chars = DefaultChars,
         CancellationToken cancellationToken = default)
     {
-        if (TryGetErrors(hash, maxTextLength, chars, out var errorsDict))
+        if (DesEndpointsValidator.TryGetErrors(hash, maxTextLength, chars, out var errorsDict))
             return TypedResults.ValidationProblem(errorsDict);
 
         const string LogDecryption = $"Decryption of the {nameof(hash)} '{{Hash}}' " +
@@ -70,7 +59,7 @@ public sealed class DesEndpoints
         [Required, RegularExpression("^[./0-9A-Za-z]+$")] string text,
         [RegularExpression("^[./0-9A-Za-z]{2}$")] string? salt = null)
     {
-        if (TryGetErrors(text, salt, out var errorsDict))
+        if (DesEndpointsValidator.TryGetErrors(text, salt, out var errorsDict))
             return TypedResults.ValidationProblem(errorsDict);
 
         try
@@ -84,39 +73,5 @@ public sealed class DesEndpoints
 
             throw;
         }
-    }
-
-    private static bool TryGetErrors(
-        string hash,
-        int maxTextLength,
-        string? chars,
-        [NotNullWhen(true)] out Dictionary<string, string[]>? errors)
-    {
-        errors = null;
-        if (hash is null || !DesValidationUtils.GetHashValidator().IsMatch(hash))
-            (errors ??= new(3)).Add(nameof(hash), new[] { HashValidationMessage });
-
-        if (!DesValidationUtils.IsMaxTextLengthValid(maxTextLength))
-            (errors ??= new(2)).Add(nameof(maxTextLength), new[] { MaxTextLengthValidationMessage });
-
-        if (chars is not null && !DesValidationUtils.GetCharsValidator().IsMatch(chars))
-            (errors ??= new(1)).Add(nameof(chars), new[] { CharsValidationMessage });
-
-        return errors is not null;
-    }
-
-    private static bool TryGetErrors(
-        string text,
-        string? salt,
-        [NotNullWhen(true)] out Dictionary<string, string[]>? errors)
-    {
-        errors = null;
-        if (text is null || !DesValidationUtils.GetCharsValidator().IsMatch(text))
-            (errors ??= new(2)).Add(nameof(text), new[] { CharsValidationMessage });
-
-        if (salt is null || !DesValidationUtils.GetSaltValidator().IsMatch(salt))
-            (errors ??= new(1)).Add(nameof(salt), new[] { SaltValidationMessage });
-
-        return errors is not null;
     }
 }

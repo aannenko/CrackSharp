@@ -2,7 +2,7 @@ using CrackSharp.Core.Des;
 
 namespace CrackSharp.Api.Services.Des;
 
-public class DesEncryptionService
+public sealed class DesEncryptionService
 {
     private readonly ILogger<DesEncryptionService> _logger;
     private readonly DecryptionMemoryCache<string, string> _cache;

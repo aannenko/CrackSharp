@@ -1,6 +1,6 @@
 ﻿namespace CrackSharp.Api.Services;
 
-public static class DecryptionMemoryCacheExtensions
+internal static class DecryptionMemoryCacheExtensions
 {
     public static string GetOrCreate(this DecryptionMemoryCache<string, string> cache, string hash, string text) =>
         cache.GetOrCreate(hash, cacheEntry =>
