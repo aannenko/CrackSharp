@@ -7,7 +7,6 @@ namespace CrackSharp.Api.Services;
 public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
 {
     private readonly IMemoryCache _cache;
-
     private readonly ConcurrentDictionary<TKey, AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>> _awaiters;
 
     public DecryptionMemoryCache(IMemoryCache cache, IEqualityComparer<TKey>? keyComparer = null)
