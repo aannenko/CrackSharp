@@ -13,11 +13,17 @@ public sealed class DesEndpoints
     public static void Map(WebApplication app)
     {
         var group = app.MapGroup("/api/v1/des").WithOpenApi();
-        group.MapGet("/decrypt", Decrypt).WithName("DecryptDesHash");
-        group.MapGet("/encrypt", Encrypt).WithName("GetDesHash");
+        
+        group.MapGet("/decrypt", Decrypt)
+            .AddEndpointFilter(DesValidationFilters.ValidateDecryptInput)
+            .WithName("DecryptDesHash");
+        
+        group.MapGet("/encrypt", Encrypt)
+            .AddEndpointFilter(DesValidationFilters.ValidateEncryptInput)
+            .WithName("GetDesHash");
     }
 
-    private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult, ValidationProblem>> Decrypt(
+    private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> Decrypt(
         ILogger<DesEndpoints> logger,
         DesBruteForceDecryptionService decryptor,
         [Required, RegularExpression("^[./0-9A-Za-z]{13}$")] string hash,
@@ -25,9 +31,6 @@ public sealed class DesEndpoints
         [RegularExpression("^[./0-9A-Za-z]+$")] string? chars = DefaultChars,
         CancellationToken cancellationToken = default)
     {
-        if (DesEndpointsValidator.TryGetErrors(hash, maxTextLength, chars, out var errorsDict))
-            return TypedResults.ValidationProblem(errorsDict);
-
         const string LogDecryption = $"Decryption of the {nameof(hash)} '{{Hash}}' " +
             $"with {nameof(maxTextLength)} = {{MaxTextLength}} and {nameof(chars)} = '{{Chars}}'";
 
@@ -53,15 +56,12 @@ public sealed class DesEndpoints
         }
     }
 
-    private static Results<Ok<string>, ValidationProblem> Encrypt(
+    private static Ok<string> Encrypt(
         ILogger<DesEndpoints> logger,
         DesEncryptionService encryptor,
         [Required, RegularExpression("^[./0-9A-Za-z]+$")] string text,
         [RegularExpression("^[./0-9A-Za-z]{2}$")] string? salt = null)
     {
-        if (DesEndpointsValidator.TryGetErrors(text, salt, out var errorsDict))
-            return TypedResults.ValidationProblem(errorsDict);
-
         try
         {
             return TypedResults.Ok(encryptor.Encrypt(text, salt));

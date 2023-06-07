@@ -1,10 +1,9 @@
 ﻿using CrackSharp.Core.Des;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace CrackSharp.Api.Endpoints.Validation;
 
-internal static class DesEndpointsValidator
+internal static class DesValidationFilters
 {
     private const string _maxTextLengthValidationMessage = "Value must be greater than 0 and less than 9.";
 
@@ -15,7 +14,7 @@ internal static class DesEndpointsValidator
     private static readonly Regex _charsValidator = DesValidationUtils.GetCharsValidator();
 
     private static readonly string _hashValidationMessage =
-        $"Value must follow pattern {_hashValidator}";
+        $"Value cannot be null or empty and must follow pattern {_hashValidator}";
 
     private static readonly string _saltValidationMessage =
         $"Value must follow pattern {_saltValidator}";
@@ -23,13 +22,15 @@ internal static class DesEndpointsValidator
     private static readonly string _charsValidationMessage =
         $"Value must follow pattern {_charsValidator}";
 
-    public static bool TryGetErrors(
-        string hash,
-        int maxTextLength,
-        string? chars,
-        [NotNullWhen(true)] out Dictionary<string, string[]>? errors)
+    public static async ValueTask<object?> ValidateDecryptInput(
+        EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        errors = null;
+        var (hash, maxTextLength, chars) =
+            (context.GetArgument<string?>(2),
+            context.GetArgument<int>(3),
+            context.GetArgument<string?>(4));
+
+        Dictionary<string, string[]>? errors = null;
         if (hash is null || !_hashValidator.IsMatch(hash))
             (errors ??= new(3)).Add(nameof(hash), new[] { _hashValidationMessage });
 
@@ -39,21 +40,29 @@ internal static class DesEndpointsValidator
         if (chars is not null && !_charsValidator.IsMatch(chars))
             (errors ??= new(1)).Add(nameof(chars), new[] { _charsValidationMessage });
 
-        return errors is not null;
+        if (errors is not null)
+            return TypedResults.ValidationProblem(errors);
+
+        return await next(context);
     }
 
-    public static bool TryGetErrors(
-        string text,
-        string? salt,
-        [NotNullWhen(true)] out Dictionary<string, string[]>? errors)
+    public static async ValueTask<object?> ValidateEncryptInput(
+        EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        errors = null;
+        var (text, salt) =
+            (context.GetArgument<string?>(2),
+            context.GetArgument<string?>(3));
+
+        Dictionary<string, string[]>? errors = null;
         if (text is null || !_charsValidator.IsMatch(text))
             (errors ??= new(2)).Add(nameof(text), new[] { _charsValidationMessage });
 
-        if (salt is null || !_saltValidator.IsMatch(salt))
+        if (salt is not null && !_saltValidator.IsMatch(salt))
             (errors ??= new(1)).Add(nameof(salt), new[] { _saltValidationMessage });
 
-        return errors is not null;
+        if (errors is not null)
+            return TypedResults.ValidationProblem(errors);
+
+        return await next(context);
     }
 }
