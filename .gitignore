@@ -2,5 +2,5 @@
 .vscode
 src/CrackSharp*/bin
 src/CrackSharp*/obj
-/src/CrackSharp.Cmd/Properties/launchSettings.json
+src/CrackSharp*/**/launchSettings.json
 *.csproj.user

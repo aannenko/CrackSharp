@@ -1,7 +1,7 @@
 ﻿using CrackSharp.Core.Des;
 using System.Text.RegularExpressions;
 
-namespace CrackSharp.Api.Endpoints.Validation;
+namespace CrackSharp.Api.Endpoints.Filters;
 
 internal static class DesValidationFilters
 {
@@ -21,13 +21,15 @@ internal static class DesValidationFilters
         $"Value must follow pattern {_charsValidator}";
 
     public static async ValueTask<object?> ValidateDecryptInput(
-        EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+        EndpointFilterInvocationContext context,
+        EndpointFilterDelegate next)
     {
         var hash = context.GetArgument<string?>(2);
         var maxTextLength = context.GetArgument<int>(3);
         var chars = context.GetArgument<string?>(4);
+
         Dictionary<string, string[]>? errors = null;
-        
+
         if (hash is null || !_hashValidator.IsMatch(hash))
             (errors ??= new(3)).Add(nameof(hash), new[] { _hashValidationMessage });
 
@@ -44,12 +46,14 @@ internal static class DesValidationFilters
     }
 
     public static async ValueTask<object?> ValidateEncryptInput(
-        EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+        EndpointFilterInvocationContext context,
+        EndpointFilterDelegate next)
     {
         var text = context.GetArgument<string?>(2);
         var salt = context.GetArgument<string?>(3);
+
         Dictionary<string, string[]>? errors = null;
-        
+
         if (text is null || !_charsValidator.IsMatch(text))
             (errors ??= new(2)).Add(nameof(text), new[] { _charsValidationMessage });
 
