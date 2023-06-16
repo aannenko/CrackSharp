@@ -53,7 +53,7 @@ docker run -d -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 --name crack-sharp c
 ```powershell
 docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:master
 ```
-Find "platforms" in [docker-publish.yml](https://github.com/aannenko/CrackSharp/blob/master/.github/workflows/docker-publish.yml).
+For supported platforms, see "platforms" in [docker-publish.yml](https://github.com/aannenko/CrackSharp/blob/master/.github/workflows/docker-publish.yml).
 
 #### Test
 Open `<container_address>/api/v1/des/encrypt?text=test` in a browser to test encryption.
