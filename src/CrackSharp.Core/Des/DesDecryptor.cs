@@ -4,8 +4,11 @@ namespace CrackSharp.Core.Des;
 
 public static class DesDecryptor
 {
-    public static Task<string> DecryptAsync<T>(string hash, T enumerable, CancellationToken cancellationToken = default)
-        where T : ISpanEnumerable<char>, IDescribable
+    public static Task<string> DecryptAsync<TEnumerable>(
+        string hash,
+        TEnumerable enumerable,
+        CancellationToken cancellationToken = default)
+        where TEnumerable : ISpanEnumerable<char>, IDescribable
     {
         if (!DesValidationUtils.GetHashValidator().IsMatch(hash))
             throw new ArgumentException(

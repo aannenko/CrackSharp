@@ -4,32 +4,32 @@ Use code in this directory to build a .NET WebAPI service, capable of bruteforci
 The service also allows to calculate crypt(3)-like DES hashes from arbitrary text and, optionally, salt.
 
 ## Usage
-Examples in PowerShell 7 or bash:
+PowerShell/bash:
 ```powershell
 # Build and run the app
 dotnet run -c Release
 
 # Attempt to decrypt 50.jPgLzVirkc using a default charset
-curl -kL 'http://localhost:5000/api/v1/des/decrypt?hash=50.jPgLzVirkc' # output: hi
+curl -kL 'http://localhost:5000/api/v1/des/decrypt/50.jPgLzVirkc' # output: "hi"
 
 # Attempt to decrypt 50.jPgLzVirkc using a charset 'efghij', give up after trying 'jjj'
-curl -kL 'http://localhost:5000/api/v1/des/decrypt?hash=50.jPgLzVirkc&chars=efghij&maxTextLength=3' # output: hi
+curl -kL 'http://localhost:5000/api/v1/des/decrypt/50.jPgLzVirkc?chars=efghij&maxTextLength=3' # output: "hi"
 
 # Encrypt 'LOL' using random salt
-curl -kL 'http://localhost:5000/api/v1/des/encrypt?text=LOL' # output (something like): FAzlTwVAZ1NZ2
+curl -kL 'http://localhost:5000/api/v1/des/encrypt/LOL' # output (something like): "FAzlTwVAZ1NZ2"
 
 # Encrypt 'LOL' using salt '50'
-curl -kL 'http://localhost:5000/api/v1/des/encrypt?text=LOL&salt=50' # output: 50cI2vYkF0YU2
+curl -kL 'http://localhost:5000/api/v1/des/encrypt/LOL?salt=50' # output: "50cI2vYkF0YU2"
 ```
 
 ### Parameters
 Decryption
-- `hash=<some_des_hash_here>` (required) - the service will attempt to find a combination of characters behind the given hash.
+- `{hash}` route value (required) - the service will attempt to find a combination of characters behind the given hash.
 - `maxTextLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value is `8` which is also a maximum, see remarks below.
 - `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
 Encryption
-- `text=<text_to_encrypt>` (required) - the service will encrypt first 8 characters of the specified text (see remarks below) and return encryption result. If salt is not specified by the user, it is generated automatically.
+- `{text}` route value (required) - the service will encrypt first 8 characters of the specified text (see remarks below) and return encryption result. If salt is not specified by the user, it is generated automatically.
 - `salt=<encryption_salt>` (optional) - salt allows for predictable encryption results. The first two characters of a hash is its salt.
 
 ## Docker
@@ -56,7 +56,7 @@ docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannen
 For supported platforms, see "platforms" in [docker-publish.yml](https://github.com/aannenko/CrackSharp/blob/master/.github/workflows/docker-publish.yml).
 
 ### Test
-Open `<container_address>/api/v1/des/encrypt?text=test` in a browser to test encryption.
+Open `<container_address>/api/v1/des/encrypt/someText` in a browser to test encryption.
 
 ### Swagger
 ```powershell
@@ -69,4 +69,4 @@ Open `<container_address>/swagger` in a browser to access swagger.
 
 2. Primary goal of each decryption request to this web service is to decrypt the specified hash. It means that the parameters `maxTextLength` and `chars` will be ignored if the service already knows a decrypted value of the hash. Also, multiple requests can be sent, looking to decrypt the same hash but with different `chars` and/or `maxTextLength`. If any of these requests decrypts the hash, the rest of the requests will immediately return the decrypted value even if their own `chars` or `maxTextLength` would make them return `404` individually.
 
-3. Encryption requests put unencrypted text and its encrypted value (hash) into cache for the decryption requests to use. For example, encryption request `/api/v1/des/encrypt?text=tungstenite&salt=a1` will return `a1dosrPtorvEw`, and a subsequent decryption request `/api/v1/des/decrypt?hash=a1dosrPtorvEw` will instantly return `tungsten` (crypt(3) only encrypts first 8 characters of the text) because the hash and its encrypted value were already in the cache.
+3. Encryption requests put unencrypted text and its encrypted value (hash) into cache for the decryption requests to use. For example, encryption request `/api/v1/des/encrypt/tungstenite?salt=a1` will return `a1dosrPtorvEw`, and a subsequent decryption request `/api/v1/des/decrypt/a1dosrPtorvEw` will instantly return `tungsten` (crypt(3) only encrypts first 8 characters of the text) because the hash and its encrypted value were already in the cache.

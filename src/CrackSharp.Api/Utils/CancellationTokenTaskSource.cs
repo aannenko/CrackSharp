@@ -1,7 +1,7 @@
 namespace CrackSharp.Api.Utils;
 
 // https://github.com/StephenCleary/AsyncEx/blob/master/src/Nito.AsyncEx.Tasks/CancellationTokenTaskSource.cs
-public sealed class CancellationTokenTaskSource<T> : IDisposable
+public sealed class CancellationTokenTaskSource<TResult> : IDisposable
 {
     private readonly IDisposable? _registration;
 
@@ -9,16 +9,16 @@ public sealed class CancellationTokenTaskSource<T> : IDisposable
     {
         if (cancellationToken.IsCancellationRequested)
         {
-            Task = System.Threading.Tasks.Task.FromCanceled<T>(cancellationToken);
+            Task = System.Threading.Tasks.Task.FromCanceled<TResult>(cancellationToken);
             return;
         }
 
-        var tcs = new TaskCompletionSource<T>();
+        var tcs = new TaskCompletionSource<TResult>();
         _registration = cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken), false);
         Task = tcs.Task;
     }
 
-    public Task<T> Task { get; private set; }
+    public Task<TResult> Task { get; private set; }
 
     public void Dispose() =>
         _registration?.Dispose();

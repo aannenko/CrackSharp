@@ -14,11 +14,11 @@ public sealed class DesEndpoints
     {
         var group = app.MapGroup("/api/v1/des").WithOpenApi();
 
-        group.MapGet("/decrypt", Decrypt)
+        group.MapGet("/decrypt/{hash}", Decrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateDecryptInput)
             .WithName("DecryptDesHash");
 
-        group.MapGet("/encrypt", Encrypt)
+        group.MapGet("/encrypt/{text}", Encrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateEncryptInput)
             .WithName("GetDesHash");
     }
@@ -26,7 +26,7 @@ public sealed class DesEndpoints
     private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> Decrypt(
         ILogger<DesEndpoints> logger,
         DesBruteForceDecryptionService decryptor,
-        [Required, RegularExpression("^[./0-9A-Za-z]{13}$")] string hash,
+        [RegularExpression("^[./0-9A-Za-z]{13}$")] string hash,
         [Range(1, 8)] int maxTextLength = 8,
         [RegularExpression("^[./0-9A-Za-z]+$")] string? chars = DefaultChars,
         CancellationToken cancellationToken = default)
@@ -60,7 +60,7 @@ public sealed class DesEndpoints
     private static Ok<string> Encrypt(
         ILogger<DesEndpoints> logger,
         DesEncryptionService encryptor,
-        [Required, RegularExpression("^[./0-9A-Za-z]+$")] string text,
+        [RegularExpression("^[./0-9A-Za-z]+$")] string text,
         [RegularExpression("^[./0-9A-Za-z]{2}$")] string? salt = null)
     {
         try
