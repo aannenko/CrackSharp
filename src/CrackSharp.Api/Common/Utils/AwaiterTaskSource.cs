@@ -1,4 +1,4 @@
-namespace CrackSharp.Api.Utils;
+namespace CrackSharp.Api.Common.Utils;
 
 public class AwaiterTaskSource<TResult>
 {

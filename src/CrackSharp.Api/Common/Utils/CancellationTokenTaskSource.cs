@@ -1,4 +1,4 @@
-namespace CrackSharp.Api.Utils;
+namespace CrackSharp.Api.Common.Utils;
 
 // https://github.com/StephenCleary/AsyncEx/blob/master/src/Nito.AsyncEx.Tasks/CancellationTokenTaskSource.cs
 public sealed class CancellationTokenTaskSource<TResult> : IDisposable

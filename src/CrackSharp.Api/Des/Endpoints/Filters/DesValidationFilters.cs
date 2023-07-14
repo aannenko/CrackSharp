@@ -1,7 +1,8 @@
-﻿using CrackSharp.Core.Des;
+﻿using CrackSharp.Api.Des.Endpoints.DTO;
+using CrackSharp.Core.Des;
 using System.Text.RegularExpressions;
 
-namespace CrackSharp.Api.Endpoints.Filters;
+namespace CrackSharp.Api.Des.Endpoints.Filters;
 
 internal static class DesValidationFilters
 {
@@ -24,9 +25,7 @@ internal static class DesValidationFilters
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
     {
-        var hash = context.GetArgument<string?>(2);
-        var maxTextLength = context.GetArgument<int>(3);
-        var chars = context.GetArgument<string?>(4);
+        var (hash, maxTextLength, chars) = context.GetArgument<DesDecryptRequest>(2);
 
         Dictionary<string, string[]>? errors = null;
 
@@ -49,8 +48,7 @@ internal static class DesValidationFilters
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
     {
-        var text = context.GetArgument<string?>(2);
-        var salt = context.GetArgument<string?>(3);
+        var (text, salt) = context.GetArgument<DesEncryptRequest>(2);
 
         Dictionary<string, string[]>? errors = null;
 

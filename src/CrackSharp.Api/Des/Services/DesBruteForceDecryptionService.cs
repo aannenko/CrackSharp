@@ -1,10 +1,12 @@
 using System.Collections.Concurrent;
-using CrackSharp.Api.Utils;
+using CrackSharp.Api.Common.Services;
+using CrackSharp.Api.Common.Services.Extensions;
+using CrackSharp.Api.Common.Utils;
 using CrackSharp.Core.Common.BruteForce;
 using CrackSharp.Core.Des;
 using CrackSharp.Core.Des.BruteForce;
 
-namespace CrackSharp.Api.Services.Des;
+namespace CrackSharp.Api.Des.Services;
 
 public sealed class DesBruteForceDecryptionService
 {

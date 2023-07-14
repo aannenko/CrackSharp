@@ -1,7 +1,7 @@
-using CrackSharp.Api;
-using CrackSharp.Api.Endpoints;
-using CrackSharp.Api.Services;
-using CrackSharp.Api.Services.Des;
+using CrackSharp.Api.Common.Extensions;
+using CrackSharp.Api.Common.Services;
+using CrackSharp.Api.Des.Endpoints;
+using CrackSharp.Api.Des.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

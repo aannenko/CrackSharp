@@ -1,6 +1,8 @@
+using CrackSharp.Api.Common.Services;
+using CrackSharp.Api.Common.Services.Extensions;
 using CrackSharp.Core.Des;
 
-namespace CrackSharp.Api.Services.Des;
+namespace CrackSharp.Api.Des.Services;
 
 public sealed class DesEncryptionService
 {
@@ -21,8 +23,8 @@ public sealed class DesEncryptionService
         var saltDescription = isSaltEmpty ? $"empty {nameof(salt)}" : $"{nameof(salt)} '{salt}'";
 
         _logger.LogInformation(
-            "Encryption of {TextParam} '{Text}' with {SaltDescription} requested.",
-            nameof(text), text, saltDescription);
+            $"Encryption of {nameof(text)} '{{{nameof(text)}}}' with {{{nameof(saltDescription)}}} requested.",
+            text, saltDescription);
 
         var trimmedText = text.Length <= 8 ? text : text[..8];
         Span<char> hashBuffer = stackalloc char[13];
@@ -35,8 +37,9 @@ public sealed class DesEncryptionService
         _cache.GetOrCreate(hash, trimmedText);
 
         _logger.LogInformation(
-            "Encryption of {TextParam} '{Text}' with {SaltDescription} succeeded. Encrypted value is '{Hash}'.",
-            nameof(text), text, saltDescription, hash);
+            $"Encryption of {nameof(text)} '{{{nameof(text)}}}' with {{{nameof(saltDescription)}}} succeeded. " +
+            $"Encrypted value is '{{{nameof(hash)}}}'.",
+            text, saltDescription, hash);
 
         return hash;
     }

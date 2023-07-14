@@ -1,15 +1,14 @@
-﻿using CrackSharp.Api.Endpoints.Filters;
-using CrackSharp.Api.Services.Des;
+﻿using CrackSharp.Api.Des.Endpoints.DTO;
+using CrackSharp.Api.Des.Endpoints.Filters;
+using CrackSharp.Api.Des.Services;
+using CrackSharp.Api.Des.Utils;
 using CrackSharp.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.ComponentModel.DataAnnotations;
 
-namespace CrackSharp.Api.Endpoints;
+namespace CrackSharp.Api.Des.Endpoints;
 
 public sealed class DesEndpoints
 {
-    private const string DefaultChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
     public static void Map(WebApplication app)
     {
         var group = app.MapGroup("/api/v1/des").WithOpenApi();
@@ -26,19 +25,21 @@ public sealed class DesEndpoints
     private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> Decrypt(
         ILogger<DesEndpoints> logger,
         DesBruteForceDecryptionService decryptor,
-        [RegularExpression("^[./0-9A-Za-z]{13}$")] string hash,
-        [Range(1, 8)] int maxTextLength = 8,
-        [RegularExpression("^[./0-9A-Za-z]+$")] string? chars = DefaultChars,
+        [AsParameters] DesDecryptRequest request,
         CancellationToken cancellationToken = default)
     {
+        var (hash, maxTextLength, chars) = request;
         const string partialMessage = $"Decryption of the {nameof(hash)} '{{{nameof(hash)}}}' " +
             $"with {nameof(maxTextLength)} = {{{nameof(maxTextLength)}}} " +
             $"and {nameof(chars)} = '{{{nameof(chars)}}}'";
 
         try
         {
-            return TypedResults.Ok(
-                await decryptor.DecryptAsync(hash, maxTextLength, chars ?? DefaultChars, cancellationToken));
+            return TypedResults.Ok(await decryptor.DecryptAsync(
+                hash,
+                maxTextLength,
+                chars ?? DesConstants.DecryptDefaultChars,
+                cancellationToken));
         }
         catch (DecryptionFailedException e)
         {
@@ -60,9 +61,10 @@ public sealed class DesEndpoints
     private static Ok<string> Encrypt(
         ILogger<DesEndpoints> logger,
         DesEncryptionService encryptor,
-        [RegularExpression("^[./0-9A-Za-z]+$")] string text,
-        [RegularExpression("^[./0-9A-Za-z]{2}$")] string? salt = null)
+        [AsParameters] DesEncryptRequest request)
     {
+        var (text, salt) = request;
+
         try
         {
             return TypedResults.Ok(encryptor.Encrypt(text, salt));

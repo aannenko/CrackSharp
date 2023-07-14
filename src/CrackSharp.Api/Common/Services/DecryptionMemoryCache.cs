@@ -1,8 +1,8 @@
-using System.Collections.Concurrent;
-using CrackSharp.Api.Utils;
+using CrackSharp.Api.Common.Utils;
 using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Concurrent;
 
-namespace CrackSharp.Api.Services;
+namespace CrackSharp.Api.Common.Services;
 
 public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
 {
@@ -21,7 +21,7 @@ public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey
         {
             using (cancellationToken.UnsafeRegister((tcs, token) =>
                 ((TaskCompletionSource<T>)tcs!).TrySetCanceled(token), tcs))
-                    return await tcs.Task;
+                return await tcs.Task;
         }
 
         var awaiter = _awaiters.GetOrAdd(key, key =>

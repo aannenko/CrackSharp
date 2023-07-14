@@ -2,8 +2,7 @@ namespace CrackSharp.Core.Des;
 
 public static class DesEncryptor
 {
-    private const string m_encryptionSaltCharacters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
+    private const string m_encryptionSaltCharacters = DesConstants.AllowedChars;
 
     private const int m_desIterations = 16;
 
