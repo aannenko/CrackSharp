@@ -1,10 +1,9 @@
-using System.Collections.Concurrent;
+using CrackSharp.Api.Common;
 using CrackSharp.Api.Common.Services;
-using CrackSharp.Api.Common.Services.Extensions;
-using CrackSharp.Api.Common.Utils;
 using CrackSharp.Core.Common.BruteForce;
 using CrackSharp.Core.Des;
 using CrackSharp.Core.Des.BruteForce;
+using System.Collections.Concurrent;
 
 namespace CrackSharp.Api.Des.Services;
 

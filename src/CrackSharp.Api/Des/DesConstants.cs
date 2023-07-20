@@ -1,4 +1,4 @@
-﻿namespace CrackSharp.Api.Des.Utils;
+﻿namespace CrackSharp.Api.Des;
 
 internal static class DesConstants
 {

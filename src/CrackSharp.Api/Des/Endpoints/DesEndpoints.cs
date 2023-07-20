@@ -1,7 +1,6 @@
 ﻿using CrackSharp.Api.Des.Endpoints.DTO;
 using CrackSharp.Api.Des.Endpoints.Filters;
 using CrackSharp.Api.Des.Services;
-using CrackSharp.Api.Des.Utils;
 using CrackSharp.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
 

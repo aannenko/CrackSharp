@@ -1,5 +1,4 @@
-﻿using CrackSharp.Api.Des.Utils;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CrackSharp.Api.Des.Endpoints.DTO;
 

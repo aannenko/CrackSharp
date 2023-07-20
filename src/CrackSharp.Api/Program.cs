@@ -1,4 +1,4 @@
-using CrackSharp.Api.Common.Extensions;
+using CrackSharp.Api.Common;
 using CrackSharp.Api.Common.Services;
 using CrackSharp.Api.Des.Endpoints;
 using CrackSharp.Api.Des.Services;

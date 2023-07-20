@@ -1,4 +1,4 @@
-﻿namespace CrackSharp.Api.Common.Extensions;
+﻿namespace CrackSharp.Api.Common;
 
 internal static class ConfigurationManagerExtensions
 {

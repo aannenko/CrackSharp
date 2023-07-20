@@ -1,5 +1,4 @@
 using CrackSharp.Api.Common.Services;
-using CrackSharp.Api.Common.Services.Extensions;
 using CrackSharp.Core.Des;
 
 namespace CrackSharp.Api.Des.Services;
