@@ -12,11 +12,11 @@ public sealed class DesEndpoints
     {
         var group = app.MapGroup("/api/v1/des").WithOpenApi();
 
-        group.MapGet("/decrypt/{hash}", Decrypt)
+        group.MapGet("/decrypt/{*hash}", Decrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateDecryptInput)
             .WithName("DecryptDesHash");
 
-        group.MapGet("/encrypt/{text}", Encrypt)
+        group.MapGet("/encrypt/{*text}", Encrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateEncryptInput)
             .WithName("GetDesHash");
     }
