@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CrackSharp.Api.Des.Endpoints.DTO;
+namespace CrackSharp.Api.Des.DTO;
 
 internal readonly record struct DesDecryptRequest(
     [RegularExpression("^[./0-9A-Za-z]{13}$")] string Hash,

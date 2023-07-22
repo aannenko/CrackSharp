@@ -1,4 +1,4 @@
-﻿using CrackSharp.Api.Des.Endpoints.DTO;
+﻿using CrackSharp.Api.Des.DTO;
 using CrackSharp.Api.Des.Endpoints.Filters;
 using CrackSharp.Api.Des.Services;
 using CrackSharp.Core;
