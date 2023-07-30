@@ -4,13 +4,13 @@ WORKDIR /source
 
 # Copy csproj and restore as distinct layers
 COPY src/CrackSharp.Api.sln .
-COPY src/CrackSharp.Core/*.csproj ./CrackSharp.Core/
-COPY src/CrackSharp.Api/*.csproj ./CrackSharp.Api/
+COPY src/CrackSharp.Core/*.csproj CrackSharp.Core/
+COPY src/CrackSharp.Api/*.csproj CrackSharp.Api/
 RUN dotnet restore
 
 # Copy everything and build the app
-COPY src/CrackSharp.Core/. ./CrackSharp.Core/
-COPY src/CrackSharp.Api/. ./CrackSharp.Api/
+COPY src/CrackSharp.Core/* CrackSharp.Core/
+COPY src/CrackSharp.Api/* CrackSharp.Api/
 RUN dotnet publish CrackSharp.Api -c Release -o /app --no-restore
 
 # Use runtime image
