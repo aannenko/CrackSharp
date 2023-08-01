@@ -10,7 +10,10 @@ RUN dotnet restore CrackSharp.Api
 # Copy everything and build the app
 COPY CrackSharp.Core/* CrackSharp.Core/
 COPY CrackSharp.Api/* CrackSharp.Api/
-RUN dotnet publish CrackSharp.Api -c Release -o /app --no-restore
+ARG BINARY_VERSION
+RUN (echo "$BINARY_VERSION" | grep -Eq  ^[0-9]+\.[0-9]+\.[0-9]+[a-zA-Z0-9\.-]*$) && \
+    dotnet publish CrackSharp.Api -c Release -o /app --no-restore -p:Version=$BINARY_VERSION || \
+    dotnet publish CrackSharp.Api -c Release -o /app --no-restore
 
 # Use runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
