@@ -47,7 +47,7 @@ public sealed class DesBruteForceDecryptionService : IDisposable
         var cacheTask = _cache.AwaitValue(hash, linkedCts.Token);
         var decryptTask = _awaiters.GetOrAdd(request, StartDecryptionAndGetAwaiter).GetAwaiterTask(linkedCts.Token);
 
-        var firstToComplete = await Task.WhenAny(cacheTask, decryptTask);
+        var firstToComplete = await Task.WhenAny(cacheTask, decryptTask).ConfigureAwait(false);
         linkedCts.Cancel();
         var text = await firstToComplete;
 
@@ -72,7 +72,8 @@ public sealed class DesBruteForceDecryptionService : IDisposable
                     return await DesDecryptor.DecryptAsync(
                         hash,
                         new BruteForceEnumerable(new DesBruteForceParams(maxTextLength, characters)),
-                        cancellationToken);
+                        cancellationToken)
+                        .ConfigureAwait(false);
                 }
                 finally
                 {
