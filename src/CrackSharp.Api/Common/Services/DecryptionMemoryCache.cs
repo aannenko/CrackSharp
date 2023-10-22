@@ -5,8 +5,12 @@ namespace CrackSharp.Api.Common.Services;
 
 public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
 {
+    private readonly record struct AwaiterCompletionSourcePair(
+        AwaiterTaskSource<TValue> Awaiter,
+        TaskCompletionSource<TValue> CompletionSource);
+
     private readonly IMemoryCache _cache;
-    private readonly ConcurrentDictionary<TKey, AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>> _awaiters;
+    private readonly ConcurrentDictionary<TKey, Lazy<AwaiterCompletionSourcePair>> _awaiters;
 
     public DecryptionMemoryCache(IMemoryCache cache, IEqualityComparer<TKey>? keyComparer = null)
     {
@@ -16,25 +20,23 @@ public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey
 
     public Task<TValue> AwaitValue(TKey key, CancellationToken cancellationToken)
     {
-        static async Task<T> GetCancellableTcsTask<T>(TaskCompletionSource<T> tcs, CancellationToken cancellationToken)
-        {
-            using (cancellationToken.UnsafeRegister((tcs, token) =>
-                ((TaskCompletionSource<T>)tcs!).TrySetCanceled(token), tcs))
-                return await tcs.Task;
-        }
+        var (awaiter, taskCompletionSource) = _awaiters.GetOrAdd(
+            key,
+            static (key, awaiters) => new(() =>
+            {
+                var taskCompletionSource = new TaskCompletionSource<TValue>();
+                var awaiter = AwaiterTaskSource<TValue>.Run(
+                    static (tcs, ct) => tcs.Task.WaitAsync(ct),
+                    taskCompletionSource);
 
-        var awaiter = _awaiters.GetOrAdd(key, key =>
-        {
-            var tcs = new TaskCompletionSource<TValue>();
-            var awaiter = new AwaiterTaskSource<TValue, TaskCompletionSource<TValue>>(ct =>
-                GetCancellableTcsTask(tcs, ct), tcs);
-
-            awaiter.Task.ContinueWith(task => _awaiters.TryRemove(key, out _), TaskScheduler.Default);
-            return awaiter;
-        });
+                awaiter.Task.ContinueWith(task => awaiters.TryRemove(key, out _), TaskScheduler.Default);
+                return new(awaiter, taskCompletionSource);
+            }),
+            _awaiters)
+            .Value;
 
         if (TryGetValue(key, out var value))
-            awaiter.State.TrySetResult(value);
+            taskCompletionSource.TrySetResult(value);
 
         return awaiter.GetAwaiterTask(cancellationToken);
     }
@@ -42,8 +44,8 @@ public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey
     public TValue GetOrCreate(TKey key, Func<ICacheEntry, TValue> factory)
     {
         var value = _cache.GetOrCreate(key, factory);
-        if (_awaiters.TryGetValue(key, out var awaiter))
-            awaiter.State.TrySetResult(value!);
+        if (_awaiters.TryGetValue(key, out var lazyPair))
+            lazyPair.Value.CompletionSource.TrySetResult(value!);
 
         return value!;
     }

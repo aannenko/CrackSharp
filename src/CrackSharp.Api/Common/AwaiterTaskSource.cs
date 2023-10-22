@@ -1,12 +1,15 @@
 namespace CrackSharp.Api.Common;
 
-public class AwaiterTaskSource<TResult>
+public sealed class AwaiterTaskSource<TResult>
 {
-    private readonly CancellationTokenSource _taskCts = new();
+    private readonly CancellationTokenSource _cancellationTokenSource;
     private int _awaitersCount = 0;
 
-    internal AwaiterTaskSource(Func<CancellationToken, Task<TResult>> taskFactory) =>
-        Task = taskFactory(_taskCts.Token);
+    private AwaiterTaskSource(Task<TResult> task, CancellationTokenSource cancellationTokenSource)
+    {
+        Task = task;
+        _cancellationTokenSource = cancellationTokenSource;
+    }
 
     public Task<TResult> Task { get; }
 
@@ -17,26 +20,28 @@ public class AwaiterTaskSource<TResult>
 
         Interlocked.Increment(ref _awaitersCount);
 
-        using var cancellation = new CancellationTokenTaskSource<TResult>(cancellationToken);
-        var mainOrCancellation = await System.Threading.Tasks.Task.WhenAny(Task, cancellation.Task)
-            .ConfigureAwait(false);
-
         try
         {
-            return await mainOrCancellation.ConfigureAwait(false);
+            return await Task.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
         finally
         {
-            if (Interlocked.Decrement(ref _awaitersCount) == 0 && mainOrCancellation != Task)
-                _taskCts.Cancel();
+            if (Interlocked.Decrement(ref _awaitersCount) is 0 && !Task.IsCompleted)
+                _cancellationTokenSource.Cancel();
         }
     }
-}
 
-public sealed class AwaiterTaskSource<TResult, TState> : AwaiterTaskSource<TResult>
-{
-    internal AwaiterTaskSource(Func<CancellationToken, Task<TResult>> taskFactory, TState state) : base(taskFactory) =>
-        State = state;
+    public static AwaiterTaskSource<TResult> Run(Func<CancellationToken, Task<TResult>> taskFactory)
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        return new(taskFactory(cancellationTokenSource.Token), cancellationTokenSource);
+    }
 
-    public TState State { get; }
+    public static AwaiterTaskSource<TResult> Run<TArg>(
+        Func<TArg, CancellationToken, Task<TResult>> taskFactory,
+        TArg factoryArgument)
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        return new(taskFactory(factoryArgument, cancellationTokenSource.Token), cancellationTokenSource);
+    }
 }

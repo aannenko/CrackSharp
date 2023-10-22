@@ -1,5 +1,6 @@
 using CrackSharp.Api.Common;
 using CrackSharp.Api.Common.Services;
+using CrackSharp.Api.Des.DTO;
 using CrackSharp.Core.Common.BruteForce;
 using CrackSharp.Core.Des;
 using CrackSharp.Core.Des.BruteForce;
@@ -7,11 +8,9 @@ using System.Collections.Concurrent;
 
 namespace CrackSharp.Api.Des.Services;
 
-public sealed class DesBruteForceDecryptionService
+public sealed class DesBruteForceDecryptionService : IDisposable
 {
-    private readonly record struct HashAndParams(string Hash, DesBruteForceParams Parameters);
-
-    private readonly ConcurrentDictionary<HashAndParams, AwaiterTaskSource<string>> _awaiters = new();
+    private readonly ConcurrentDictionary<DesDecryptRequest, AwaiterTaskSource<string>> _awaiters = new();
     private readonly ILogger<DesBruteForceDecryptionService> _logger;
     private readonly DecryptionMemoryCache<string, string> _cache;
 
@@ -23,46 +22,30 @@ public sealed class DesBruteForceDecryptionService
         _cache = cache;
     }
 
-    public ValueTask<string> DecryptAsync(
-        string hash,
-        int maxTextLength,
-        string chars,
-        CancellationToken cancellationToken)
+    public ValueTask<string> DecryptAsync(DesDecryptRequest request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation(
-            $"Decryption of a {nameof(hash)} '{{{nameof(hash)}}}' with {nameof(maxTextLength)} " +
-            $"'{{{nameof(maxTextLength)}}}' and {nameof(chars)} '{{{nameof(chars)}}}' requested.",
-            hash, maxTextLength, chars);
-
+        var (hash, _, _) = request;
         if (_cache.TryGetValue(hash, out var text))
         {
-            _logger.LogInformation(
-                $"Decrypted value of the {nameof(hash)} '{{{nameof(hash)}}}' was found in cache; " +
-                $"the value is '{{{nameof(text)}}}'.",
-                hash, text);
-
+            _logger.LogDebug($"Decrypted value of the {nameof(hash)} '{{{nameof(hash)}}}' was found in cache.", hash);
             return new ValueTask<string>(text);
         }
 
-        return new ValueTask<string>(StartDecryptionAsync(hash, maxTextLength, chars, cancellationToken));
+        return new ValueTask<string>(StartDecryptionAsync(request, cancellationToken));
     }
 
-    private async Task<string> StartDecryptionAsync(
-        string hash,
-        int maxTextLength,
-        string chars,
-        CancellationToken cancellationToken)
+    private async Task<string> StartDecryptionAsync(DesDecryptRequest request, CancellationToken cancellationToken)
     {
-        var taskId = $"{hash} - {DateTime.UtcNow:o}";
-        _logger.LogInformation(
+        var (hash, maxTextLength, chars) = request;
+        var taskId = $"{hash}-{DateTime.UtcNow:o}";
+        _logger.LogDebug(
             $"Starting a decryption task '{{{nameof(taskId)}}}'. Parameters used: " +
             $"{nameof(maxTextLength)} = {{{nameof(maxTextLength)}}}, {nameof(chars)} = '{{{nameof(chars)}}}'.",
             taskId, maxTextLength, chars);
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var cacheTask = _cache.AwaitValue(hash, linkedCts.Token);
-        var decryptTask = _awaiters.GetOrAdd(new(hash, new(maxTextLength, chars)), StartDecryptionAndGetAwaiter)
-            .GetAwaiterTask(linkedCts.Token);
+        var decryptTask = _awaiters.GetOrAdd(request, StartDecryptionAndGetAwaiter).GetAwaiterTask(linkedCts.Token);
 
         var firstToComplete = await Task.WhenAny(cacheTask, decryptTask);
         linkedCts.Cancel();
@@ -71,27 +54,33 @@ public sealed class DesBruteForceDecryptionService
         _cache.GetOrCreate(hash, text);
 
         if (firstToComplete == decryptTask)
-            _logger.LogInformation(
-                $"Decryption task '{{{nameof(taskId)}}}' succeeded. Parameters used: " +
-                $"{nameof(maxTextLength)} = {{{nameof(maxTextLength)}}}, {nameof(chars)} = '{{{nameof(chars)}}}'. " +
-                $"The {nameof(hash)} '{{{nameof(hash)}}}' corresponds to '{{{nameof(text)}}}'.",
-                taskId, maxTextLength, chars, hash, text);
+            _logger.LogDebug($"Decryption task '{{{nameof(taskId)}}}' succeeded.", taskId);
         else
-            _logger.LogInformation(
-                $"Decryption task '{{{nameof(taskId)}}}' succeeded. Another task successfully decrypted " +
-                $"the {nameof(hash)} '{{{nameof(hash)}}}' and it corresponds to '{{{nameof(text)}}}'.",
-                taskId, hash, text);
+            _logger.LogDebug($"Decryption task '{{{nameof(taskId)}}}' succeeded, will use the cached value.", taskId);
 
         return text;
     }
 
-    private AwaiterTaskSource<string> StartDecryptionAndGetAwaiter(HashAndParams hashAndParams)
-    {
-        var (hash, parameters) = hashAndParams;
-        var awaiter = new AwaiterTaskSource<string>(token =>
-            DesDecryptor.DecryptAsync(hash, new BruteForceEnumerable(parameters), token));
+    private AwaiterTaskSource<string> StartDecryptionAndGetAwaiter(DesDecryptRequest request) =>
+        AwaiterTaskSource<string>.Run(
+            static async (requestAwaitersPair, cancellationToken) =>
+            {
+                var (request, awaiters) = requestAwaitersPair;
+                var (hash, maxTextLength, characters) = request;
+                try
+                {
+                    return await DesDecryptor.DecryptAsync(
+                        hash,
+                        new BruteForceEnumerable(new DesBruteForceParams(maxTextLength, characters)),
+                        cancellationToken);
+                }
+                finally
+                {
+                    awaiters.TryRemove(request, out _);
+                }
+            },
+            (request, _awaiters));
 
-        awaiter.Task.ContinueWith(task => _awaiters.TryRemove(hashAndParams, out _), TaskScheduler.Default);
-        return awaiter;
-    }
+    public void Dispose() =>
+        _cache.Dispose();
 }

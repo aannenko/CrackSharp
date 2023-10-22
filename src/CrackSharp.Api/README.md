@@ -27,7 +27,7 @@ curl -kL 'http://localhost:5000/api/v1/des/encrypt/LOL?salt=50' # output: "50cI2
 ### Parameters
 Decryption
 - `{hash}` route value (required) - the service will attempt to find a combination of characters behind the given hash.
-- `maxTextLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value is `8` which is also a maximum, see remarks below.
+- `maxTextLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value is `8` which is also the maximum, see remarks below.
 - `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
 Encryption
@@ -55,7 +55,7 @@ docker run -d -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 --name crack-sharp c
 ```powershell
 docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:master
 ```
-For supported platforms, see "platforms" in [docker-publish.yml](https://github.com/aannenko/CrackSharp/blob/master/.github/workflows/docker-publish.yml).
+For supported platforms and available tags, see the [packages](https://github.com/aannenko/CrackSharp/pkgs/container/cracksharp).
 
 ### Test
 Open `<container_address>/api/v1/des/encrypt/someText` in a browser to test encryption.

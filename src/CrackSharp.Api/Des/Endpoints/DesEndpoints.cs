@@ -23,22 +23,21 @@ public sealed class DesEndpoints
 
     private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> Decrypt(
         ILogger<DesEndpoints> logger,
-        DesBruteForceDecryptionService decryptor,
+        DesBruteForceDecryptionService decryptionService,
         [AsParameters] DesDecryptRequest request,
         CancellationToken cancellationToken = default)
     {
         var (hash, maxTextLength, chars) = request;
         const string partialMessage = $"Decryption of the {nameof(hash)} '{{{nameof(hash)}}}' " +
-            $"with {nameof(maxTextLength)} = {{{nameof(maxTextLength)}}} " +
-            $"and {nameof(chars)} = '{{{nameof(chars)}}}'";
+            $"with {nameof(maxTextLength)} {{{nameof(maxTextLength)}}} and {nameof(chars)} '{{{nameof(chars)}}}'";
 
         try
         {
-            return TypedResults.Ok(await decryptor.DecryptAsync(
-                hash,
-                maxTextLength,
-                chars ?? DesConstants.DecryptDefaultChars,
-                cancellationToken));
+            logger.LogInformation($"{partialMessage} requested.", hash, maxTextLength, chars);
+            var decrypted = await decryptionService.DecryptAsync(request, cancellationToken);
+            logger.LogInformation($"{partialMessage} succeeded.", hash, maxTextLength, chars);
+            
+            return TypedResults.Ok(decrypted);
         }
         catch (DecryptionFailedException e)
         {
@@ -59,21 +58,24 @@ public sealed class DesEndpoints
 
     private static Ok<string> Encrypt(
         ILogger<DesEndpoints> logger,
-        DesEncryptionService encryptor,
+        DesEncryptionService encryptionService,
         [AsParameters] DesEncryptRequest request)
     {
         var (text, salt) = request;
+        const string partialMessage = $"Encryption of the {nameof(text)} '{{{nameof(text)}}}' " +
+            $"with {nameof(salt)} '{{{nameof(salt)}}}'";
 
         try
         {
-            return TypedResults.Ok(encryptor.Encrypt(text, salt));
+            logger.LogInformation($"{partialMessage} requested.", text, salt);
+            var encrypted = encryptionService.Encrypt(text, salt);
+            logger.LogInformation($"{partialMessage} succeeded.", text, salt);
+
+            return TypedResults.Ok(encrypted);
         }
         catch (Exception e)
         {
-            const string errorMessage = $"Encryption of the {nameof(text)} '{{{nameof(text)}}}' " +
-                $"with {nameof(salt)} '{{{nameof(salt)}}}' failed.";
-
-            logger.LogError(e, errorMessage, text, salt);
+            logger.LogError(e, $"{partialMessage} failed.", text, salt);
             throw;
         }
     }

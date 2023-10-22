@@ -20,7 +20,7 @@ internal static class DesValidationFilters
         $"Value must follow pattern {_saltValidator}";
 
     private static readonly string _charsValidationMessage =
-        $"Value must follow pattern {_charsValidator}";
+        $"Value cannot be null or empty and must follow pattern {_charsValidator}";
 
     public static async ValueTask<object?> ValidateDecryptInput(
         EndpointFilterInvocationContext context,
@@ -39,13 +39,10 @@ internal static class DesValidationFilters
         if (!DesValidationUtils.IsMaxTextLengthValid(maxTextLength))
             (errors ??= new(2)).Add(nameof(maxTextLength), new[] { _maxTextLengthValidationMessage });
 
-        if (chars is not null && !_charsValidator.IsMatch(chars))
+        if (chars is null || !_charsValidator.IsMatch(chars))
             (errors ??= new(1)).Add(nameof(chars), new[] { _charsValidationMessage });
 
-        if (errors is not null)
-            return TypedResults.ValidationProblem(errors);
-
-        return await next(context);
+        return errors is null ? await next(context) : TypedResults.ValidationProblem(errors);
     }
 
     public static async ValueTask<object?> ValidateEncryptInput(
@@ -65,9 +62,6 @@ internal static class DesValidationFilters
         if (salt is not null && !_saltValidator.IsMatch(salt))
             (errors ??= new(1)).Add(nameof(salt), new[] { _saltValidationMessage });
 
-        if (errors is not null)
-            return TypedResults.ValidationProblem(errors);
-
-        return await next(context);
+        return errors is null ? await next(context) : TypedResults.ValidationProblem(errors);
     }
 }
