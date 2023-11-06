@@ -5,9 +5,9 @@ namespace CrackSharp.Api.Des.Services;
 
 public sealed class DesEncryptionService : IDisposable
 {
-    private readonly DecryptionMemoryCache<string, string> _cache;
+    private readonly AwaitableMemoryCache<string, string> _cache;
 
-    public DesEncryptionService(DecryptionMemoryCache<string, string> cache) =>
+    public DesEncryptionService(AwaitableMemoryCache<string, string> cache) =>
         _cache = cache;
 
     public string Encrypt(string text, string? salt = null)

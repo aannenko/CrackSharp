@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddMemoryCache(options => options.SizeLimit = builder.Configuration.GetCacheSizeLimit());
-builder.Services.AddSingleton(typeof(DecryptionMemoryCache<,>));
+builder.Services.AddSingleton(typeof(AwaitableMemoryCache<,>));
 builder.Services.AddSingleton<DesBruteForceDecryptionService>();
 builder.Services.AddSingleton<DesEncryptionService>();
 

@@ -12,11 +12,11 @@ public sealed class DesBruteForceDecryptionService : IDisposable
 {
     private readonly ConcurrentDictionary<DesDecryptRequest, AwaiterTaskSource<string>> _awaiters = new();
     private readonly ILogger<DesBruteForceDecryptionService> _logger;
-    private readonly DecryptionMemoryCache<string, string> _cache;
+    private readonly AwaitableMemoryCache<string, string> _cache;
 
     public DesBruteForceDecryptionService(
         ILogger<DesBruteForceDecryptionService> logger,
-        DecryptionMemoryCache<string, string> cache)
+        AwaitableMemoryCache<string, string> cache)
     {
         _logger = logger;
         _cache = cache;
@@ -44,7 +44,7 @@ public sealed class DesBruteForceDecryptionService : IDisposable
             taskId, maxTextLength, chars);
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        var cacheTask = _cache.AwaitValue(hash, linkedCts.Token);
+        var cacheTask = _cache.AwaitValueAsync(hash, linkedCts.Token);
         var decryptTask = _awaiters.GetOrAdd(request, StartDecryptionAndGetAwaiter).GetAwaiterTask(linkedCts.Token);
 
         var firstToComplete = await Task.WhenAny(cacheTask, decryptTask).ConfigureAwait(false);

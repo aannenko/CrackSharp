@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace CrackSharp.Api.Common.Services;
 
-public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
+public sealed class AwaitableMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
 {
     private readonly record struct AwaiterCompletionSourcePair(
         AwaiterTaskSource<TValue> Awaiter,
@@ -12,14 +12,17 @@ public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey
     private readonly IMemoryCache _cache;
     private readonly ConcurrentDictionary<TKey, Lazy<AwaiterCompletionSourcePair>> _awaiters;
 
-    public DecryptionMemoryCache(IMemoryCache cache, IEqualityComparer<TKey>? keyComparer = null)
+    public AwaitableMemoryCache(IMemoryCache cache, IEqualityComparer<TKey>? keyComparer = null)
     {
         _cache = cache;
         _awaiters = new(keyComparer);
     }
 
-    public Task<TValue> AwaitValue(TKey key, CancellationToken cancellationToken)
+    public Task<TValue> AwaitValueAsync(TKey key, CancellationToken cancellationToken)
     {
+        if (TryGetValue(key, out var value))
+            return Task.FromResult(value);
+
         var (awaiter, taskCompletionSource) = _awaiters.GetOrAdd(
             key,
             static (key, awaiters) => new(() =>
@@ -35,7 +38,7 @@ public sealed class DecryptionMemoryCache<TKey, TValue> : IDisposable where TKey
             _awaiters)
             .Value;
 
-        if (TryGetValue(key, out var value))
+        if (TryGetValue(key, out value))
             taskCompletionSource.TrySetResult(value);
 
         return awaiter.GetAwaiterTask(cancellationToken);
