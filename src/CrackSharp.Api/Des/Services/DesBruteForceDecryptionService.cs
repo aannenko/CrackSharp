@@ -10,7 +10,7 @@ namespace CrackSharp.Api.Des.Services;
 
 public sealed class DesBruteForceDecryptionService : IDisposable
 {
-    private readonly ConcurrentDictionary<DesDecryptRequest, AwaiterTaskSource<string>> _awaiters = new();
+    private readonly ConcurrentDictionary<DesDecryptRequest, Lazy<AwaiterTaskSource<string>>> _awaiters = new();
     private readonly ILogger<DesBruteForceDecryptionService> _logger;
     private readonly AwaitableMemoryCache<string, string> _cache;
 
@@ -36,6 +36,7 @@ public sealed class DesBruteForceDecryptionService : IDisposable
 
     private async Task<string> StartDecryptionAsync(DesDecryptRequest request, CancellationToken cancellationToken)
     {
+
         var (hash, maxTextLength, chars) = request;
         var taskId = $"{hash}-{DateTime.UtcNow:o}";
         _logger.LogDebug(
@@ -45,7 +46,7 @@ public sealed class DesBruteForceDecryptionService : IDisposable
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var cacheTask = _cache.AwaitValueAsync(hash, linkedCts.Token);
-        var decryptTask = _awaiters.GetOrAdd(request, StartDecryptionAndGetAwaiter).GetAwaiterTask(linkedCts.Token);
+        var decryptTask = _awaiters.GetOrAdd(request, DecryptLazy, _awaiters).Value.GetAwaiterTask(linkedCts.Token);
 
         var firstToComplete = await Task.WhenAny(cacheTask, decryptTask).ConfigureAwait(false);
         linkedCts.Cancel();
@@ -61,27 +62,32 @@ public sealed class DesBruteForceDecryptionService : IDisposable
         return text;
     }
 
-    private AwaiterTaskSource<string> StartDecryptionAndGetAwaiter(DesDecryptRequest request) =>
-        AwaiterTaskSource<string>.Run(
-            static async (requestAwaitersPair, cancellationToken) =>
-            {
-                var (request, awaiters) = requestAwaitersPair;
-                var (hash, maxTextLength, characters) = request;
-                try
-                {
-                    return await DesDecryptor.DecryptAsync(
-                        hash,
-                        new BruteForceEnumerable(new DesBruteForceParams(maxTextLength, characters)),
-                        cancellationToken)
-                        .ConfigureAwait(false);
-                }
-                finally
-                {
-                    awaiters.TryRemove(request, out _);
-                }
-            },
-            (request, _awaiters));
-
     public void Dispose() =>
         _cache.Dispose();
+
+    private static Lazy<AwaiterTaskSource<string>> DecryptLazy(
+        DesDecryptRequest request,
+        ConcurrentDictionary<DesDecryptRequest, Lazy<AwaiterTaskSource<string>>> awaiters)
+    {
+        return new(() =>
+            AwaiterTaskSource<string>.Run(
+                static async (requestAwaitersPair, cancellationToken) =>
+                {
+                    var (request, awaiters) = requestAwaitersPair;
+                    var (hash, maxTextLength, characters) = request;
+                    try
+                    {
+                        return await DesDecryptor.DecryptAsync(
+                            hash,
+                            new BruteForceEnumerable(new DesBruteForceParams(maxTextLength, characters)),
+                            cancellationToken)
+                            .ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        awaiters.TryRemove(request, out _);
+                    }
+                },
+                (request, awaiters)));
+    }
 }
