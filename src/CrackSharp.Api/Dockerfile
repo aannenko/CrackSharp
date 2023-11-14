@@ -1,5 +1,5 @@
 # Use SDK image
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /source
 
 # Copy csproj and restore as distinct layers
@@ -16,7 +16,7 @@ RUN (echo "$BINARY_VERSION" | grep -Eq "^[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9.]+)?$")
     dotnet publish CrackSharp.Api -c Release -o /app --no-restore
 
 # Use runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
 # Copy build results and run the app

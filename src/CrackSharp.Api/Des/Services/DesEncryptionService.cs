@@ -3,13 +3,8 @@ using CrackSharp.Core.Des;
 
 namespace CrackSharp.Api.Des.Services;
 
-public sealed class DesEncryptionService : IDisposable
+public sealed class DesEncryptionService(AwaitableMemoryCache<string, string> cache) : IDisposable
 {
-    private readonly AwaitableMemoryCache<string, string> _cache;
-
-    public DesEncryptionService(AwaitableMemoryCache<string, string> cache) =>
-        _cache = cache;
-
     public string Encrypt(string text, string? salt = null)
     {
         var trimmedText = text.Length <= 8 ? text : text[..8];
@@ -20,11 +15,11 @@ public sealed class DesEncryptionService : IDisposable
             DesEncryptor.Encrypt(trimmedText, salt, hashBuffer);
 
         var hash = hashBuffer.ToString();
-        _cache.GetOrCreate(hash, trimmedText);
+        cache.GetOrCreate(hash, trimmedText);
 
         return hash;
     }
     
     public void Dispose() =>
-        _cache.Dispose();
+        cache.Dispose();
 }

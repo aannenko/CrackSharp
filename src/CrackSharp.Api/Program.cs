@@ -26,6 +26,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-DesEndpoints.Map(app);
+app.MapDesApi();
 
 app.Run();

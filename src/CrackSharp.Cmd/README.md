@@ -9,7 +9,7 @@ Chars = "abcXYZ"; // the app will only build words from these characters
 ```
 
 ## Usage
-You will need [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) installed.
+You will need [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) installed.
 
 Example in PowerShell/bash:
 ```powershell

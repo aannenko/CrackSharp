@@ -1,11 +1,8 @@
 namespace CrackSharp.Core.Common.BruteForce;
 
-public sealed class BruteForceEnumerable : ISpanEnumerable<char>, IDescribable
+public sealed class BruteForceEnumerable(IBruteForceParams parameters) : ISpanEnumerable<char>, IDescribable
 {
-    private readonly IBruteForceParams _params;
-
-    public BruteForceEnumerable(IBruteForceParams parameters) =>
-        _params = parameters ?? throw new ArgumentNullException(nameof(parameters));
+    private readonly IBruteForceParams _params = parameters ?? throw new ArgumentNullException(nameof(parameters));
 
     public string Description =>
         $"Brute-force enumerable combining characters '{_params.Characters}' " +

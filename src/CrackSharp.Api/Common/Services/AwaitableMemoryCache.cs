@@ -3,20 +3,15 @@ using System.Collections.Concurrent;
 
 namespace CrackSharp.Api.Common.Services;
 
-public sealed class AwaitableMemoryCache<TKey, TValue> : IDisposable where TKey : notnull
+public sealed class AwaitableMemoryCache<TKey, TValue>(
+    IMemoryCache cache,
+    IEqualityComparer<TKey>? keyComparer = null) : IDisposable where TKey : notnull
 {
     private readonly record struct AwaiterCompletionSourcePair(
         AwaiterTaskSource<TValue> Awaiter,
         TaskCompletionSource<TValue> CompletionSource);
 
-    private readonly IMemoryCache _cache;
-    private readonly ConcurrentDictionary<TKey, Lazy<AwaiterCompletionSourcePair>> _awaiters;
-
-    public AwaitableMemoryCache(IMemoryCache cache, IEqualityComparer<TKey>? keyComparer = null)
-    {
-        _cache = cache;
-        _awaiters = new(keyComparer);
-    }
+    private readonly ConcurrentDictionary<TKey, Lazy<AwaiterCompletionSourcePair>> _awaiters = new(keyComparer);
 
     public Task<TValue> AwaitValueAsync(TKey key, CancellationToken cancellationToken)
     {
@@ -46,7 +41,7 @@ public sealed class AwaitableMemoryCache<TKey, TValue> : IDisposable where TKey 
 
     public TValue GetOrCreate(TKey key, Func<ICacheEntry, TValue> factory)
     {
-        var value = _cache.GetOrCreate(key, factory);
+        var value = cache.GetOrCreate(key, factory);
         if (_awaiters.TryGetValue(key, out var lazyPair))
             lazyPair.Value.CompletionSource.TrySetResult(value!);
 
@@ -54,11 +49,11 @@ public sealed class AwaitableMemoryCache<TKey, TValue> : IDisposable where TKey 
     }
 
     public bool TryGetValue(TKey key, out TValue value) =>
-        _cache.TryGetValue(key, out value!);
+        cache.TryGetValue(key, out value!);
 
     public void Remove(TKey key) =>
-        _cache.Remove(key);
+        cache.Remove(key);
 
     public void Dispose() =>
-        _cache.Dispose();
+        cache.Dispose();
 }

@@ -1,16 +1,15 @@
-﻿using CrackSharp.Api.Des.DTO;
+﻿using CrackSharp.Api.Des.Model;
 using CrackSharp.Api.Des.Endpoints.Filters;
-using CrackSharp.Api.Des.Services;
 using CrackSharp.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace CrackSharp.Api.Des.Endpoints;
 
-public sealed class DesEndpoints
+public static class DesApi
 {
-    public static void Map(WebApplication app)
+    public static IEndpointRouteBuilder MapDesApi(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/des").WithOpenApi();
+        var group = app.MapGroup("/api/v1/des");
 
         group.MapGet("/decrypt/{*hash}", Decrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateDecryptInput)
@@ -19,15 +18,18 @@ public sealed class DesEndpoints
         group.MapGet("/encrypt/{*text}", Encrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateEncryptInput)
             .WithName("GetDesHash");
+
+        return app;
     }
 
     private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> Decrypt(
-        ILogger<DesEndpoints> logger,
-        DesBruteForceDecryptionService decryptionService,
         [AsParameters] DesDecryptRequest request,
+        [AsParameters] DesDecryptServices services,
         CancellationToken cancellationToken = default)
     {
+        var (decryptionService, logger) = services;
         var (hash, maxTextLength, chars) = request;
+        
         const string partialMessage = $"Decryption of the {nameof(hash)} '{{{nameof(hash)}}}' " +
             $"with {nameof(maxTextLength)} {{{nameof(maxTextLength)}}} and {nameof(chars)} '{{{nameof(chars)}}}'";
 
@@ -57,11 +59,12 @@ public sealed class DesEndpoints
     }
 
     private static Ok<string> Encrypt(
-        ILogger<DesEndpoints> logger,
-        DesEncryptionService encryptionService,
-        [AsParameters] DesEncryptRequest request)
+        [AsParameters] DesEncryptRequest request,
+        [AsParameters] DesEncryptServices services)
     {
+        var (encryptionService, logger) = services;
         var (text, salt) = request;
+        
         const string partialMessage = $"Encryption of the {nameof(text)} '{{{nameof(text)}}}' " +
             $"with {nameof(salt)} '{{{nameof(salt)}}}'";
 

@@ -80,6 +80,7 @@ dotnet_style_qualification_for_field = false:silent
 dotnet_style_qualification_for_property = false:silent
 dotnet_style_qualification_for_method = false:silent
 dotnet_style_qualification_for_event = false:silent
+dotnet_style_prefer_collection_expression = true:suggestion
 
 [*.cs]
 csharp_indent_labels = one_less_than_current
@@ -132,3 +133,4 @@ csharp_style_prefer_primary_constructors = true:suggestion
 
 # SYSLIB1045: Convert to 'GeneratedRegexAttribute'.
 dotnet_diagnostic.SYSLIB1045.severity = suggestion
+csharp_space_around_binary_operators = before_and_after
