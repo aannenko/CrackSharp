@@ -20,6 +20,10 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
+  # platforms for the Docker multiplatform build
+  PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
+  # location of the Dockerfile
+  DOCKERFILE: ./CrackSharp.Api/Dockerfile
 
 jobs:
   docker:
@@ -33,16 +37,6 @@ jobs:
       - name: downcase IMAGE_NAME
         run: |
           echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-
-      # https://github.com/actions/setup-dotnet
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.x'
-
-      # https://github.com/docker/setup-qemu-action
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       # Among other things, make buildx support multiplatform builds
       # https://github.com/docker/setup-buildx-action
@@ -78,8 +72,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: "{{defaultContext}}:src"
-          file: ./CrackSharp.Api/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          file: ${{ env.DOCKERFILE }}
+          platforms: ${{ env.PLATFORMS }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
