@@ -2,6 +2,9 @@
 
 namespace CrackSharp.Api.Des.Model;
 
-public readonly record struct DesEncryptServices(
-    DesEncryptionService EncryptionService,
-    ILogger<DesEncryptServices> Logger);
+public readonly struct DesEncryptServices
+{
+    public required DesEncryptionService EncryptionService { get; init; }
+
+    public required ILogger<DesEncryptServices> Logger { get; init; }
+}

@@ -27,7 +27,8 @@ public static class DesApi
         [AsParameters] DesDecryptServices services,
         CancellationToken cancellationToken = default)
     {
-        var (decryptionService, logger) = services;
+        var decryptionService = services.DecryptionService;
+        var logger = services.Logger;
         var (hash, maxTextLength, chars) = request;
         
         const string partialMessage = $"Decryption of the {nameof(hash)} '{{{nameof(hash)}}}' " +
@@ -62,7 +63,8 @@ public static class DesApi
         [AsParameters] DesEncryptRequest request,
         [AsParameters] DesEncryptServices services)
     {
-        var (encryptionService, logger) = services;
+        var encryptionService = services.EncryptionService;
+        var logger = services.Logger;
         var (text, salt) = request;
         
         const string partialMessage = $"Encryption of the {nameof(text)} '{{{nameof(text)}}}' " +
