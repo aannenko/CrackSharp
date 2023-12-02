@@ -28,7 +28,6 @@ public sealed class DesBruteForceDecryptionService(
 
     private async Task<string> StartDecryptionAsync(DesDecryptRequest request, CancellationToken cancellationToken)
     {
-
         var (hash, maxTextLength, chars) = request;
         var taskId = $"{hash}-{DateTime.UtcNow:o}";
         logger.LogDebug(
