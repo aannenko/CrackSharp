@@ -16,7 +16,7 @@ public sealed class DesBruteForceDecryptionService(
 
     public ValueTask<string> DecryptAsync(DesDecryptRequest request, CancellationToken cancellationToken)
     {
-        var (hash, _, _) = request;
+        var hash = request.Hash;
         if (cache.TryGetValue(hash, out var text))
         {
             logger.LogDebug($"Decrypted value of the {nameof(hash)} '{{{nameof(hash)}}}' was found in cache.", hash);
