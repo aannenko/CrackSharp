@@ -53,7 +53,7 @@ docker run -d -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 --name crack-sharp c
 
 ### Run a pre-made image
 ```powershell
-docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:master
+docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:latest
 ```
 For supported platforms and available tags, see the [packages](https://github.com/aannenko/CrackSharp/pkgs/container/cracksharp).
 
@@ -62,7 +62,7 @@ Open `<container_address>/api/v1/des/encrypt/someText` in a browser to test encr
 
 ### Swagger
 ```powershell
-docker run -it --rm -p 5000:5000 -e DOTNET_ENVIRONMENT=Development -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:master
+docker run -it --rm -p 5000:5000 -e DOTNET_ENVIRONMENT=Development -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:latest
 ```
 Open `<container_address>/swagger` in a browser to access swagger.
 
