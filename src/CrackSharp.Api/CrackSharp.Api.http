@@ -1,0 +1,17 @@
+﻿@CrackSharp.Api_HostAddress = https://localhost:5001
+
+GET {{CrackSharp.Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2
+
+### 200 "LOL"
+
+GET {{CrackSharp.Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?chars=LMNO&maxTextLength=4
+
+### 200 "LOL"
+
+GET {{CrackSharp.Api_HostAddress}}/api/v1/des/encrypt/abc
+
+### 200 DES hash based on random salt
+
+GET {{CrackSharp.Api_HostAddress}}/api/v1/des/encrypt/abc?salt=50
+
+### 200 "50PaJ4.RO0YUo"

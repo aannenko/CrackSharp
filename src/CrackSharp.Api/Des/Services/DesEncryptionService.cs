@@ -19,7 +19,7 @@ public sealed class DesEncryptionService(AwaitableMemoryCache<string, string> ca
 
         return hash;
     }
-    
+
     public void Dispose() =>
         cache.Dispose();
 }

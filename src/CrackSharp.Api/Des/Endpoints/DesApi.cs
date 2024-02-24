@@ -25,12 +25,12 @@ public static class DesApi
     private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> Decrypt(
         [AsParameters] DesDecryptRequest request,
         [AsParameters] DesDecryptServices services,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var decryptionService = services.DecryptionService;
         var logger = services.Logger;
         var (hash, maxTextLength, chars) = request;
-        
+
         const string partialMessage = $"Decryption of the {nameof(hash)} '{{{nameof(hash)}}}' " +
             $"with {nameof(maxTextLength)} {{{nameof(maxTextLength)}}} and {nameof(chars)} '{{{nameof(chars)}}}'";
 
@@ -39,7 +39,7 @@ public static class DesApi
             logger.LogInformation($"{partialMessage} requested.", hash, maxTextLength, chars);
             var decrypted = await decryptionService.DecryptAsync(request, cancellationToken);
             logger.LogInformation($"{partialMessage} succeeded.", hash, maxTextLength, chars);
-            
+
             return TypedResults.Ok(decrypted);
         }
         catch (DecryptionFailedException e)
@@ -66,7 +66,7 @@ public static class DesApi
         var encryptionService = services.EncryptionService;
         var logger = services.Logger;
         var (text, salt) = request;
-        
+
         const string partialMessage = $"Encryption of the {nameof(text)} '{{{nameof(text)}}}' " +
             $"with {nameof(salt)} '{{{nameof(salt)}}}'";
 
