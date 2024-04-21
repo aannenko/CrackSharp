@@ -9,8 +9,8 @@ COPY CrackSharp.Api/*.csproj CrackSharp.Api/
 RUN dotnet restore CrackSharp.Api -a $TARGETARCH
 
 # Copy everything and build the app
-COPY CrackSharp.Core/* CrackSharp.Core/
-COPY CrackSharp.Api/* CrackSharp.Api/
+COPY CrackSharp.Core/. CrackSharp.Core/
+COPY CrackSharp.Api/. CrackSharp.Api/
 ARG BINARY_VERSION
 RUN (echo "$BINARY_VERSION" | grep -Eq "^[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9.]+)?$") && \
     dotnet publish CrackSharp.Api --no-restore -a $TARGETARCH -o /app -p:Version=$BINARY_VERSION || \
