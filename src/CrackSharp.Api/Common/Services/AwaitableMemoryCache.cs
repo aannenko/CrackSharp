@@ -30,8 +30,7 @@ public sealed class AwaitableMemoryCache<TKey, TValue>(
                 awaiter.Task.ContinueWith(task => awaiters.TryRemove(key, out _), TaskScheduler.Default);
                 return new(awaiter, taskCompletionSource);
             }),
-            _awaiters)
-            .Value;
+            _awaiters).Value;
 
         if (TryGetValue(key, out value))
             taskCompletionSource.TrySetResult(value);

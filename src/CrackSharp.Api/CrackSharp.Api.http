@@ -1,17 +1,73 @@
-﻿@CrackSharp.Api_HostAddress = https://localhost:5001
+﻿@CrackSharp_Api_HostAddress = http://localhost:5000
 
-GET {{CrackSharp.Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2
-
-### 200 "LOL"
-
-GET {{CrackSharp.Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?chars=LMNO&maxTextLength=4
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2
 
 ### 200 "LOL"
 
-GET {{CrackSharp.Api_HostAddress}}/api/v1/des/encrypt/abc
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?chars=LMNO&maxTextLength=4
+
+### 200 "LOL"
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?chars=LMNO
+
+### 200 "LOL"
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?maxTextLength=4
+
+### 200 "LOL"
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/encrypt/abc
 
 ### 200 DES hash based on random salt
 
-GET {{CrackSharp.Api_HostAddress}}/api/v1/des/encrypt/abc?salt=50
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/encrypt/abc?salt=50
 
 ### 200 "50PaJ4.RO0YUo"
+
+
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt
+
+### 400 "Required parameter "string hash" was not provided from route or query string."
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ
+
+### 400 "hash": [ "Value cannot be null or empty and must follow pattern ^[./0-9A-Za-z]{13}$" ]
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?maxTextLength=9
+
+### 400 "maxTextLength": [ "Value must be greater than 0 and less than 9." ]
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?chars=-_
+
+### 400 "chars": [ "Value cannot be null or empty and must follow pattern ^[./0-9A-Za-z]+$" ]
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ?maxTextLength=9&chars=-_
+
+### 400 Multiple error messages for parameters
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/encrypt
+
+### 400 Required parameter "string text" was not provided from route or query string.
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/encrypt/-_
+
+### 400 "text": [ "Value cannot be null or empty and must follow pattern ^[./0-9A-Za-z]+$" ]
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/encrypt/abc?salt=_
+
+### 400 "salt": [ "Value must follow pattern ^[./0-9A-Za-z]{2}$" ]
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/encrypt/abc?salt=def
+
+### 400 "salt": [ "Value must follow pattern ^[./0-9A-Za-z]{2}$" ]
+
+
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?maxTextLength=2
+
+### 404 Not Found
+
+GET {{CrackSharp_Api_HostAddress}}/api/v1/des/decrypt/FAzlTwVAZ1NZ2?chars=L
+
+### 404 Not Found

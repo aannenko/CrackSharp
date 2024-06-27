@@ -26,11 +26,13 @@ internal static class DesValidationFilters
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
     {
-        var request = context.GetArgument<DesDecryptRequest>(0);
-        request = request with { Hash = WebUtility.UrlDecode(request.Hash) };
-        context.Arguments[0] = request;
+        var hash = context.GetArgument<string>(1);
+        var maxTextLength = context.GetArgument<int>(2);
+        var chars = context.GetArgument<string>(3);
 
-        var (hash, maxTextLength, chars) = request;
+        hash = WebUtility.UrlDecode(hash);
+        context.Arguments[1] = hash;
+
         Dictionary<string, string[]>? errors = null;
 
         if (hash is null || !_hashValidator.IsMatch(hash))
@@ -49,11 +51,12 @@ internal static class DesValidationFilters
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
     {
-        var request = context.GetArgument<DesEncryptRequest>(0);
-        request = request with { Text = WebUtility.UrlDecode(request.Text) };
-        context.Arguments[0] = request;
+        var text = context.GetArgument<string>(1);
+        var salt = context.GetArgument<string>(2);
 
-        var (text, salt) = request;
+        text = WebUtility.UrlDecode(text);
+        context.Arguments[1] = text;
+
         Dictionary<string, string[]>? errors = null;
 
         if (text is null || !_charsValidator.IsMatch(text))

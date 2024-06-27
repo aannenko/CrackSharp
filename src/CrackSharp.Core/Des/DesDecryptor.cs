@@ -11,9 +11,11 @@ public static class DesDecryptor
         where TEnumerable : ISpanEnumerable<char>, IDescribable
     {
         if (!DesValidationUtils.GetHashValidator().IsMatch(hash))
+        {
             throw new ArgumentException(
-                $"Value must consist of exactly 13 chars from the set {DesConstants.AllowedCharsPattern}.",
+                $"Value must consist of exactly 13 characters from the set {DesConstants.AllowedCharsPattern}.",
                 nameof(hash));
+        }
 
         return Task.Run(
             () =>
@@ -28,7 +30,7 @@ public static class DesDecryptor
                         return text.ToString();
                 }
 
-                throw new DecryptionFailedException($"Decryption of the {nameof(hash)} '{hash}' " +
+                throw new DecryptionFailedException($"Decryption of the DES {nameof(hash)} '{hash}' " +
                     $"using the following {nameof(enumerable)} has failed. {enumerable.Description}");
             },
             cancellationToken);

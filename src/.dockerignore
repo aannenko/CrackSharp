@@ -10,6 +10,7 @@
 **/.vscode
 **/*.*proj.user
 **/*.dbmdl
+**/*.http
 **/*.jfm
 **/azds.yaml
 **/bin
@@ -19,10 +20,11 @@
 **/node_modules
 **/npm-debug.log
 **/obj
+**/Properties
+**/README.md
 **/secrets.dev.yaml
 **/values.dev.yaml
 LICENSE
-README.md
 !**/.gitignore
 !.git/HEAD
 !.git/config
