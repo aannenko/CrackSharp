@@ -14,11 +14,13 @@ public static class DesApi
 
         group.MapGet("/decrypt/{*hash}", Decrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateDecryptInput)
-            .WithName("DecryptDesHash");
+            .WithName("DecryptDesHash")
+            .WithOpenApi();
 
         group.MapGet("/encrypt/{*text}", Encrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateEncryptInput)
-            .WithName("GetDesHash");
+            .WithName("GetDesHash")
+            .WithOpenApi();
 
         return app;
     }
