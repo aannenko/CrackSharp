@@ -1,5 +1,4 @@
-﻿using CrackSharp.Api.Des.Model;
-using CrackSharp.Core.Des;
+﻿using CrackSharp.Core.Des;
 using System.Net;
 using System.Text.RegularExpressions;
 
