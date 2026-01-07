@@ -27,7 +27,7 @@ public sealed class AwaiterTaskSource<TResult>
         finally
         {
             if (Interlocked.Decrement(ref _awaitersCount) is 0 && !Task.IsCompleted)
-                await _cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+                _cancellationTokenSource.Cancel();
         }
     }
 
