@@ -43,7 +43,7 @@ internal static class DesValidationFilters
         if (chars is null || !_charsValidator.IsMatch(chars))
             (errors ??= new(1)).Add(nameof(chars), [_charsValidationMessage]);
 
-        return errors is null ? await next(context) : TypedResults.ValidationProblem(errors);
+        return errors is null ? await next(context).ConfigureAwait(false) : TypedResults.ValidationProblem(errors);
     }
 
     public static async ValueTask<object?> ValidateEncryptInput(
@@ -64,6 +64,6 @@ internal static class DesValidationFilters
         if (salt is not null && !_saltValidator.IsMatch(salt))
             (errors ??= new(1)).Add(nameof(salt), [_saltValidationMessage]);
 
-        return errors is null ? await next(context) : TypedResults.ValidationProblem(errors);
+        return errors is null ? await next(context).ConfigureAwait(false) : TypedResults.ValidationProblem(errors);
     }
 }

@@ -3,6 +3,6 @@
 namespace CrackSharp.Api.Common;
 
 [JsonSerializable(typeof(HttpValidationProblemDetails))]
-internal partial class AppJsonSerializerContext : JsonSerializerContext
+internal sealed partial class AppJsonSerializerContext : JsonSerializerContext
 {
 }
