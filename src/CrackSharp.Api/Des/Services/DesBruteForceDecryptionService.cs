@@ -40,8 +40,8 @@ public sealed class DesBruteForceDecryptionService(
         var decryptTask = _awaiters.GetOrAdd(request, DecryptLazy, _awaiters).Value.GetAwaiterTask(linkedCts.Token);
 
         var firstToComplete = await Task.WhenAny(cacheTask, decryptTask).ConfigureAwait(false);
-        linkedCts.Cancel();
-        var text = await firstToComplete;
+        await linkedCts.CancelAsync().ConfigureAwait(false);
+        var text = await firstToComplete.ConfigureAwait(false);
 
         cache.GetOrCreate(hash, text);
 

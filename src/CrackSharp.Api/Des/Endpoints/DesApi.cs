@@ -41,7 +41,7 @@ public static class DesApi
         try
         {
             logger.LogInformation($"{partialMessage} requested.", hash, maxTextLength, chars);
-            var decrypted = await decryptionService.DecryptAsync(new(hash, maxTextLength, chars) , cancellationToken);
+            var decrypted = await decryptionService.DecryptAsync(new(hash, maxTextLength, chars) , cancellationToken).ConfigureAwait(false);
             logger.LogInformation($"{partialMessage} succeeded.", hash, maxTextLength, chars);
 
             return TypedResults.Ok(decrypted);
