@@ -60,11 +60,11 @@ For supported platforms and available tags, see the [packages](https://github.co
 ### Test
 Open `<container_address>/api/v1/des/encrypt/someText` in a browser to test encryption.
 
-### Swagger
+### Scalar
 ```powershell
 docker run -it --rm -p 5000:5000 -e DOTNET_ENVIRONMENT=Development -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:latest
 ```
-Open `<container_address>/swagger` in a browser to access swagger.
+Open `<container_address>/scalar` in a browser to access the API documentation.
 
 ## Remarks
 1. Two or more decryption requests with the same trio of parameters `hash`, `maxTextLength` and `chars`, including omitted parameters with their default values, will start only one decryption task. When the decryption task is complete, all these requests will return the decrypted value or `404` if the hash could not be decrypted. Any request may be canceled during the decryption process - this will not cancel the task unless all the requests are canceled and no one is waiting for the task's completion, in which case the task is canceled.
