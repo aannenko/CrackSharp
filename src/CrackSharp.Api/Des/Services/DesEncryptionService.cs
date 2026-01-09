@@ -3,7 +3,7 @@ using CrackSharp.Core.Des;
 
 namespace CrackSharp.Api.Des.Services;
 
-public sealed class DesEncryptionService(AwaitableMemoryCache<string, string> cache) : IDisposable
+internal sealed class DesEncryptionService(AwaitableMemoryCache<string, string> cache) : IDisposable
 {
     public string Encrypt(string text, string? salt = null)
     {

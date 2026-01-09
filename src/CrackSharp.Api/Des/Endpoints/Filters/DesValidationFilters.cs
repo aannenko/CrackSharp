@@ -35,7 +35,7 @@ internal static class DesValidationFilters
         Dictionary<string, string[]>? errors = null;
 
         if (hash is null || !_hashValidator.IsMatch(hash))
-            (errors ??= new(3)).Add(nameof(hash), [_hashValidationMessage]);
+            (errors = new(3)).Add(nameof(hash), [_hashValidationMessage]);
 
         if (!DesValidationUtils.IsMaxTextLengthValid(maxTextLength))
             (errors ??= new(2)).Add(nameof(maxTextLength), [_maxTextLengthValidationMessage]);
@@ -59,7 +59,7 @@ internal static class DesValidationFilters
         Dictionary<string, string[]>? errors = null;
 
         if (text is null || !_charsValidator.IsMatch(text))
-            (errors ??= new(2)).Add(nameof(text), [_charsValidationMessage]);
+            (errors = new(2)).Add(nameof(text), [_charsValidationMessage]);
 
         if (salt is not null && !_saltValidator.IsMatch(salt))
             (errors ??= new(1)).Add(nameof(salt), [_saltValidationMessage]);

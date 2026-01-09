@@ -1,9 +1,9 @@
 namespace CrackSharp.Api.Common;
 
-public sealed class AwaiterTaskSource<TResult>
+internal sealed class AwaiterTaskSource<TResult>
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private int _awaitersCount = 0;
+    private int _awaitersCount;
 
     private AwaiterTaskSource(Task<TResult> task, CancellationTokenSource cancellationTokenSource)
     {
@@ -33,6 +33,8 @@ public sealed class AwaiterTaskSource<TResult>
 
     public static AwaiterTaskSource<TResult> Run(Func<CancellationToken, Task<TResult>> taskFactory)
     {
+        ArgumentNullException.ThrowIfNull(taskFactory);
+
         var cancellationTokenSource = new CancellationTokenSource();
         return new(taskFactory(cancellationTokenSource.Token), cancellationTokenSource);
     }
@@ -41,6 +43,8 @@ public sealed class AwaiterTaskSource<TResult>
         Func<TArg, CancellationToken, Task<TResult>> taskFactory,
         TArg factoryArgument)
     {
+        ArgumentNullException.ThrowIfNull(taskFactory);
+
         var cancellationTokenSource = new CancellationTokenSource();
         return new(taskFactory(factoryArgument, cancellationTokenSource.Token), cancellationTokenSource);
     }

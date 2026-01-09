@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrackSharp.Api.Des.Model;
 
-public readonly struct DesEncryptServices
+internal readonly struct DesEncryptServices
 {
     [FromServices]
     public required DesEncryptionService EncryptionService { get; init; }

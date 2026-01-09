@@ -8,7 +8,7 @@ using System.Collections.Concurrent;
 
 namespace CrackSharp.Api.Des.Services;
 
-public sealed class DesBruteForceDecryptionService(
+internal sealed class DesBruteForceDecryptionService(
     ILogger<DesBruteForceDecryptionService> logger,
     AwaitableMemoryCache<string, string> cache) : IDisposable
 {

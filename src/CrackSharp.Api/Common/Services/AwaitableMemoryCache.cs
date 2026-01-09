@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace CrackSharp.Api.Common.Services;
 
-public sealed class AwaitableMemoryCache<TKey, TValue>(
+internal sealed class AwaitableMemoryCache<TKey, TValue>(
     IMemoryCache cache,
     IEqualityComparer<TKey>? keyComparer = null) : IDisposable where TKey : notnull
 {

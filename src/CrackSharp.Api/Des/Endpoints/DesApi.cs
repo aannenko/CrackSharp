@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CrackSharp.Api.Des.Endpoints;
 
-public static class DesApi
+internal static class DesApi
 {
     public static IEndpointRouteBuilder MapDesApi(this IEndpointRouteBuilder app)
     {
@@ -14,13 +14,11 @@ public static class DesApi
 
         group.MapGet("/decrypt/{*hash}", Decrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateDecryptInput)
-            .WithName("DecryptDesHash")
-            .WithOpenApi();
+            .WithName("DecryptDesHash");
 
         group.MapGet("/encrypt/{*text}", Encrypt)
             .AddEndpointFilter(DesValidationFilters.ValidateEncryptInput)
-            .WithName("GetDesHash")
-            .WithOpenApi();
+            .WithName("GetDesHash");
 
         return app;
     }
