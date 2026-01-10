@@ -1,4 +1,5 @@
-﻿using CrackSharp.Api.Des.Services;
+﻿using CrackSharp.Api.Common.Logging;
+using CrackSharp.Api.Des.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CrackSharp.Api.Des.Model;
@@ -9,5 +10,5 @@ internal readonly struct DesEncryptServices
     public required DesEncryptionService EncryptionService { get; init; }
 
     [FromServices]
-    public required ILogger<DesEncryptServices> Logger { get; init; }
+    public required Log<DesEncryptServices> Logger { get; init; }
 }

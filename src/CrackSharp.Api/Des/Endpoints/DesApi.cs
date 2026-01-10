@@ -33,30 +33,27 @@ internal static class DesApi
         var decryptionService = services.DecryptionService;
         var logger = services.Logger;
 
-        const string partialMessage = $"Decryption of the {nameof(hash)} '{{{nameof(hash)}}}' " +
-            $"with {nameof(maxTextLength)} {{{nameof(maxTextLength)}}} and {nameof(chars)} '{{{nameof(chars)}}}'";
-
         try
         {
-            logger.LogInformation($"{partialMessage} requested.", hash, maxTextLength, chars);
+            logger.DecryptionRequested(hash, maxTextLength, chars);
             var decrypted = await decryptionService.DecryptAsync(new(hash, maxTextLength, chars) , cancellationToken).ConfigureAwait(false);
-            logger.LogInformation($"{partialMessage} succeeded.", hash, maxTextLength, chars);
+            logger.DecryptionSucceeded(hash, maxTextLength, chars);
 
             return TypedResults.Ok(decrypted);
         }
         catch (DecryptionFailedException e)
         {
-            logger.LogInformation(e, $"{partialMessage} failed. Value not found.", hash, maxTextLength, chars);
+            logger.DecryptionFailed(e, hash, maxTextLength, chars);
             return TypedResults.NotFound();
         }
         catch (OperationCanceledException e)
         {
-            logger.LogInformation(e, $"{partialMessage} canceled.", hash, maxTextLength, chars);
+            logger.DecryptionCanceled(e, hash, maxTextLength, chars);
             return TypedResults.StatusCode(StatusCodes.Status408RequestTimeout);
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"{partialMessage} failed.", hash, maxTextLength, chars);
+            logger.DecryptionError(e, hash, maxTextLength, chars);
             throw;
         }
     }
@@ -69,20 +66,17 @@ internal static class DesApi
         var encryptionService = services.EncryptionService;
         var logger = services.Logger;
 
-        const string partialMessage = $"Encryption of the {nameof(text)} '{{{nameof(text)}}}' " +
-            $"with {nameof(salt)} '{{{nameof(salt)}}}'";
-
         try
         {
-            logger.LogInformation($"{partialMessage} requested.", text, salt);
+            logger.EncryptionRequested(text, salt);
             var encrypted = encryptionService.Encrypt(text, salt);
-            logger.LogInformation($"{partialMessage} succeeded.", text, salt);
+            logger.EncryptionSucceeded(text, salt);
 
             return TypedResults.Ok(encrypted);
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"{partialMessage} failed.", text, salt);
+            logger.EncryptionError(e, text, salt);
             throw;
         }
     }

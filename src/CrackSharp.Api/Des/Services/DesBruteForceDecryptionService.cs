@@ -1,4 +1,5 @@
 using CrackSharp.Api.Common;
+using CrackSharp.Api.Common.Logging;
 using CrackSharp.Api.Common.Services;
 using CrackSharp.Api.Des.Model;
 using CrackSharp.Core.Common.BruteForce;
@@ -9,7 +10,7 @@ using System.Collections.Concurrent;
 namespace CrackSharp.Api.Des.Services;
 
 internal sealed class DesBruteForceDecryptionService(
-    ILogger<DesBruteForceDecryptionService> logger,
+    Log<DesBruteForceDecryptionService> logger,
     AwaitableMemoryCache<string, string> cache) : IDisposable
 {
     private readonly ConcurrentDictionary<DesDecryptRequest, Lazy<AwaiterTaskSource<string>>> _awaiters = new();
@@ -19,7 +20,7 @@ internal sealed class DesBruteForceDecryptionService(
         var hash = request.Hash;
         if (cache.TryGetValue(hash, out var text))
         {
-            logger.LogDebug($"Decrypted value of the {nameof(hash)} '{{{nameof(hash)}}}' was found in cache.", hash);
+            logger.DecryptedValueFoundInCache(hash);
             return new ValueTask<string>(text);
         }
 
@@ -30,10 +31,7 @@ internal sealed class DesBruteForceDecryptionService(
     {
         var (hash, maxTextLength, chars) = request;
         var taskId = $"{hash}-{DateTime.UtcNow:o}";
-        logger.LogDebug(
-            $"Starting a decryption task '{{{nameof(taskId)}}}'. Parameters used: " +
-            $"{nameof(maxTextLength)} = {{{nameof(maxTextLength)}}}, {nameof(chars)} = '{{{nameof(chars)}}}'.",
-            taskId, maxTextLength, chars);
+        logger.StartingDecryptionTask(taskId, maxTextLength, chars);
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var cacheTask = cache.AwaitValueAsync(hash, linkedCts.Token);
@@ -46,9 +44,9 @@ internal sealed class DesBruteForceDecryptionService(
         cache.GetOrCreate(hash, text);
 
         if (firstToComplete == decryptTask)
-            logger.LogDebug($"Decryption task '{{{nameof(taskId)}}}' succeeded.", taskId);
+            logger.DecryptionTaskSucceeded(taskId);
         else
-            logger.LogDebug($"Decryption task '{{{nameof(taskId)}}}' succeeded, will use the cached value.", taskId);
+            logger.DecryptionTaskSucceededUseCachedValue(taskId);
 
         return text;
     }
