@@ -1,9 +1,7 @@
-using CrackSharp.Api.Common;
-using CrackSharp.Api.Common.Logging;
-using CrackSharp.Api.Common.Services;
-using CrackSharp.Api.Des.Endpoints;
-using CrackSharp.Api.Des.Services;
-using Microsoft.AspNetCore.Routing.Constraints;
+using CrackSharp.Api.Actions;
+using CrackSharp.Api.Extensions;
+using CrackSharp.Api.Serialization;
+using CrackSharp.Api.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateSlimBuilder(args);
@@ -11,17 +9,17 @@ var builder = WebApplication.CreateSlimBuilder(args);
 builder.Services.ConfigureHttpJsonOptions(
     options => options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default));
 
-builder.Services.Configure<RouteOptions>(
-    options => options.SetParameterPolicy<RegexInlineRouteConstraint>("regex"));
+builder.Services.AddOpenApi();
+
+builder.Services.AddValidation();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddSingleton(typeof(Log<>));
+
 builder.Services.AddMemoryCache(options => options.SizeLimit = builder.Configuration.GetCacheSizeLimit());
 builder.Services.AddSingleton(typeof(AwaitableMemoryCache<,>));
-builder.Services.AddSingleton<DesBruteForceDecryptionService>();
-builder.Services.AddSingleton<DesEncryptionService>();
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnetcore/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddDesServices();
 
 var app = builder.Build();
 
@@ -30,7 +28,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+else
+{
+    app.UseExceptionHandler();
+}
 
-app.MapDesApi();
+app.UseStatusCodePages();
 
-app.Run();
+app.MapDesEndpoints();
+
+await app.RunAsync().ConfigureAwait(false);

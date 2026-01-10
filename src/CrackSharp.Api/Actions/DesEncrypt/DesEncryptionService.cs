@@ -1,9 +1,10 @@
-using CrackSharp.Api.Common.Services;
+using CrackSharp.Api.Extensions;
+using CrackSharp.Api.Services;
 using CrackSharp.Core.Des;
 
-namespace CrackSharp.Api.Des.Services;
+namespace CrackSharp.Api.Actions.DesEncrypt;
 
-internal sealed class DesEncryptionService(AwaitableMemoryCache<string, string> cache) : IDisposable
+internal sealed class DesEncryptionService(AwaitableMemoryCache<string, string> cache)
 {
     public string Encrypt(string text, string? salt = null)
     {
@@ -19,7 +20,4 @@ internal sealed class DesEncryptionService(AwaitableMemoryCache<string, string> 
 
         return hash;
     }
-
-    public void Dispose() =>
-        cache.Dispose();
 }

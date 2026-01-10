@@ -1,11 +1,13 @@
+using CrackSharp.Api.Awaiting;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
 
-namespace CrackSharp.Api.Common.Services;
+namespace CrackSharp.Api.Services;
 
 internal sealed class AwaitableMemoryCache<TKey, TValue>(
     IMemoryCache cache,
-    IEqualityComparer<TKey>? keyComparer = null) : IDisposable where TKey : notnull
+    IEqualityComparer<TKey>? keyComparer = null)
+    where TKey : notnull
 {
     private readonly record struct AwaiterCompletionSourcePair(
         AwaiterTaskSource<TValue> Awaiter,
@@ -52,7 +54,4 @@ internal sealed class AwaitableMemoryCache<TKey, TValue>(
 
     public void Remove(TKey key) =>
         cache.Remove(key);
-
-    public void Dispose() =>
-        cache.Dispose();
 }

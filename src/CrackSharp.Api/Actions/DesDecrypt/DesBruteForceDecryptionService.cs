@@ -1,17 +1,16 @@
-using CrackSharp.Api.Common;
-using CrackSharp.Api.Common.Logging;
-using CrackSharp.Api.Common.Services;
-using CrackSharp.Api.Des.Model;
+using CrackSharp.Api.Awaiting;
+using CrackSharp.Api.Extensions;
+using CrackSharp.Api.Services;
 using CrackSharp.Core.Common.BruteForce;
 using CrackSharp.Core.Des;
 using CrackSharp.Core.Des.BruteForce;
 using System.Collections.Concurrent;
 
-namespace CrackSharp.Api.Des.Services;
+namespace CrackSharp.Api.Actions.DesDecrypt;
 
 internal sealed class DesBruteForceDecryptionService(
     Log<DesBruteForceDecryptionService> logger,
-    AwaitableMemoryCache<string, string> cache) : IDisposable
+    AwaitableMemoryCache<string, string> cache)
 {
     private readonly ConcurrentDictionary<DesDecryptRequest, Lazy<AwaiterTaskSource<string>>> _awaiters = new();
 
@@ -50,9 +49,6 @@ internal sealed class DesBruteForceDecryptionService(
 
         return text;
     }
-
-    public void Dispose() =>
-        cache.Dispose();
 
     private static Lazy<AwaiterTaskSource<string>> DecryptLazy(
         DesDecryptRequest request,

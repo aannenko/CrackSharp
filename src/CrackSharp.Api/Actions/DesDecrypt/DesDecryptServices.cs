@@ -1,8 +1,7 @@
-﻿using CrackSharp.Api.Common.Logging;
-using CrackSharp.Api.Des.Services;
+﻿using CrackSharp.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CrackSharp.Api.Des.Model;
+namespace CrackSharp.Api.Actions.DesDecrypt;
 
 internal readonly struct DesDecryptServices
 {

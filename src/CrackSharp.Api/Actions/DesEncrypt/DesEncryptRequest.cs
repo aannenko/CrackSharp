@@ -1,4 +1,4 @@
-﻿namespace CrackSharp.Api.Des.Model;
+﻿namespace CrackSharp.Api.Actions.DesEncrypt;
 
 internal readonly record struct DesEncryptRequest(
     string Text,

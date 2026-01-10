@@ -32,15 +32,15 @@ GET {{CrackSharp_Api_HostAddress}}/decrypt
 
 GET {{CrackSharp_Api_HostAddress}}/decrypt/FAzlTwVAZ1NZ
 
-### 400 "hash": [ "Value cannot be null or empty and must follow pattern ^[./0-9A-Za-z]{13}$" ]
+### 400 "hash": [ "The field hash must match the regular expression '^[./0-9A-Za-z]{13}$'." ]
 
 GET {{CrackSharp_Api_HostAddress}}/decrypt/FAzlTwVAZ1NZ2?maxTextLength=9
 
-### 400 "maxTextLength": [ "Value must be greater than 0 and less than 9." ]
+### 400 "maxTextLength": [ "The field maxTextLength must be between 1 and 8." ]
 
 GET {{CrackSharp_Api_HostAddress}}/decrypt/FAzlTwVAZ1NZ2?chars=-_
 
-### 400 "chars": [ "Value cannot be null or empty and must follow pattern ^[./0-9A-Za-z]+$" ]
+### 400 "chars": [ "The field chars must match the regular expression '^[./0-9A-Za-z]+$'." ]
 
 GET {{CrackSharp_Api_HostAddress}}/decrypt/FAzlTwVAZ1NZ?maxTextLength=9&chars=-_
 
@@ -52,15 +52,15 @@ GET {{CrackSharp_Api_HostAddress}}/encrypt
 
 GET {{CrackSharp_Api_HostAddress}}/encrypt/-_
 
-### 400 "text": [ "Value cannot be null or empty and must follow pattern ^[./0-9A-Za-z]+$" ]
+### 400 "text": [ "The field text must match the regular expression '^[./0-9A-Za-z]+$'." ]
 
 GET {{CrackSharp_Api_HostAddress}}/encrypt/abc?salt=_
 
-### 400 "salt": [ "Value must follow pattern ^[./0-9A-Za-z]{2}$" ]
+### 400 "salt": [ "The field salt must match the regular expression '^[./0-9A-Za-z]{2}$'." ]
 
 GET {{CrackSharp_Api_HostAddress}}/encrypt/abc?salt=def
 
-### 400 "salt": [ "Value must follow pattern ^[./0-9A-Za-z]{2}$" ]
+### 400 "salt": [ "The field salt must match the regular expression '^[./0-9A-Za-z]{2}$'." ]
 
 
 

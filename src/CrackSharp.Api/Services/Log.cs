@@ -1,16 +1,7 @@
-using Microsoft.Extensions.Logging;
+namespace CrackSharp.Api.Services;
 
-namespace CrackSharp.Api.Common.Logging;
-
-internal sealed partial class Log<T>
+internal sealed partial class Log<T>(ILogger<T> logger)
 {
-    private readonly ILogger<T> _logger;
-
-    public Log(ILogger<T> logger)
-    {
-        _logger = logger;
-    }
-
     // Debug level logs - Decryption (10000-19999)
     [LoggerMessage(
         EventId = 10000,

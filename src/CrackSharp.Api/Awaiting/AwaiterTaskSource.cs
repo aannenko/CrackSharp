@@ -1,4 +1,4 @@
-namespace CrackSharp.Api.Common;
+namespace CrackSharp.Api.Awaiting;
 
 internal sealed class AwaiterTaskSource<TResult>
 {
