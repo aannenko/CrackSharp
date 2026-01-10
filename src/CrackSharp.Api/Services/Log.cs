@@ -1,4 +1,4 @@
-namespace CrackSharp.Api.Services;
+﻿namespace CrackSharp.Api.Services;
 
 internal sealed partial class Log<T>(ILogger<T> logger)
 {

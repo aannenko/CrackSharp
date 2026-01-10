@@ -1,4 +1,4 @@
-namespace CrackSharp.Core.Common;
+﻿namespace CrackSharp.Core.Common;
 
 public interface IDescribable
 {

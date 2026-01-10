@@ -1,4 +1,4 @@
-# CrackSharp.Api
+﻿# CrackSharp.Api
 Use code in this directory to build a .NET WebAPI service, capable of bruteforcing DES hashes produced by [crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html), using a specified charset and expected length of the text behind the hash. It can decrypt multiple hashes in parallel: it starts a new decryption task for each *unique* set of parameters (see remarks below).
 
 The service also allows to calculate crypt(3)-like DES hashes from arbitrary text and, optionally, salt.

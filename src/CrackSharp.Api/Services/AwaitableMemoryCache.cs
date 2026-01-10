@@ -1,4 +1,4 @@
-using CrackSharp.Api.Awaiting;
+﻿using CrackSharp.Api.Awaiting;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
 

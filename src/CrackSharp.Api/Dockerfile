@@ -1,4 +1,4 @@
-# Use SDK image
+﻿# Use SDK image
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build
 ARG TARGETARCH
 ARG BINARY_VERSION

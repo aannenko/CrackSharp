@@ -1,4 +1,4 @@
-namespace CrackSharp.Core;
+﻿namespace CrackSharp.Core;
 
 public class DecryptionFailedException : Exception
 {

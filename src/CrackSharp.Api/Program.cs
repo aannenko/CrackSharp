@@ -1,4 +1,4 @@
-using CrackSharp.Api.Actions;
+﻿using CrackSharp.Api.Actions;
 using CrackSharp.Api.Extensions;
 using CrackSharp.Api.Serialization;
 using CrackSharp.Api.Services;

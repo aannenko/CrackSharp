@@ -1,4 +1,4 @@
-using CrackSharp.Core.Common;
+﻿using CrackSharp.Core.Common;
 
 namespace CrackSharp.Core.Des;
 

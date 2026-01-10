@@ -1,4 +1,4 @@
-namespace CrackSharp.Core.Common.BruteForce;
+﻿namespace CrackSharp.Core.Common.BruteForce;
 
 public sealed class BruteForceEnumerable(IBruteForceParams parameters) : ISpanEnumerable<char>, IDescribable
 {

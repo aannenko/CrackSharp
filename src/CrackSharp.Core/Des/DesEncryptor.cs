@@ -1,4 +1,4 @@
-namespace CrackSharp.Core.Des;
+﻿namespace CrackSharp.Core.Des;
 
 public static class DesEncryptor
 {

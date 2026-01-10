@@ -1,4 +1,4 @@
-using CrackSharp.Api.Awaiting;
+﻿using CrackSharp.Api.Awaiting;
 using CrackSharp.Api.Extensions;
 using CrackSharp.Api.Services;
 using CrackSharp.Core.Common.BruteForce;
