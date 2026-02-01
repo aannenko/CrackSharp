@@ -1,0 +1,18 @@
+{
+  "name": "CrackSharp Azure Functions Codespace",
+  "dockerFile": "Dockerfile",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-bicep",
+        "ms-azuretools.vscode-docker",
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-dotnettools.csdevkit",
+        "azurite.azurite",
+        "github.copilot-chat",
+        "humao.rest-client"
+      ]
+    }
+  },
+  "forwardPorts": [5000, 7129]
+}
