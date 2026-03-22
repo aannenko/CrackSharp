@@ -1,9 +1,11 @@
 ﻿using CrackSharp.Api.Extensions;
 using CrackSharp.Api.Services;
 using CrackSharp.Core.Des;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Actions.DesEncrypt;
 
+[SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by DI")]
 internal sealed class DesEncryptionService(AwaitableMemoryCache<string, string> cache)
 {
     public string Encrypt(string text, string? salt = null)

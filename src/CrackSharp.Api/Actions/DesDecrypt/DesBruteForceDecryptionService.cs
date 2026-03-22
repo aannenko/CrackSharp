@@ -5,9 +5,11 @@ using CrackSharp.Core.Common.BruteForce;
 using CrackSharp.Core.Des;
 using CrackSharp.Core.Des.BruteForce;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Actions.DesDecrypt;
 
+[SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by DI")]
 internal sealed class DesBruteForceDecryptionService(
     Log<DesBruteForceDecryptionService> logger,
     AwaitableMemoryCache<string, string> cache)

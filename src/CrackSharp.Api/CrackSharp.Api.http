@@ -1,4 +1,4 @@
-﻿@CrackSharp_Api_HostAddress = http://localhost:5000/api/v1/des
+﻿@CrackSharp_Api_HostAddress = http://localhost:7071/api/v1/des
 
 GET {{CrackSharp_Api_HostAddress}}/decrypt/FAzlTwVAZ1NZ2
 

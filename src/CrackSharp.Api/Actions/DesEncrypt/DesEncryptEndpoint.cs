@@ -1,24 +1,22 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using CrackSharp.Api.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Azure.Functions.Worker;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Actions.DesEncrypt;
 
-internal static class DesEncryptEndpoint
+[SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by DI")]
+internal sealed class DesEncryptEndpoint(
+    DesEncryptionService encryptionService,
+    Log<DesEncryptEndpoint> logger)
 {
-    public static IEndpointRouteBuilder MapDesEncryptEndpoint(this IEndpointRouteBuilder app)
-    {
-        app.MapGet("/encrypt/{*text}", EncryptAsync).WithName("GetDesHash");
-        return app;
-    }
-
-    private static Ok<string> EncryptAsync(
-        [AsParameters] DesEncryptServices services,
+    [Function("GetDesHash")]
+    public Ok<string> Encrypt(
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/des/encrypt/{*text}")] HttpRequest req,
         [Required][RegularExpression("^[./0-9A-Za-z]+$")] string text,
         [RegularExpression("^[./0-9A-Za-z]{2}$")] string? salt = null)
     {
-        var encryptionService = services.EncryptionService;
-        var logger = services.Logger;
-
         try
         {
             logger.EncryptionRequested(text, salt);

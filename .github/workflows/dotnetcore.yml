@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -18,5 +18,5 @@ jobs:
     - name: Build command line app
       run: dotnet build src/CrackSharp.Cmd --configuration Release
 
-    - name: Build WebAPI app
+    - name: Build Azure Functions app
       run: dotnet build src/CrackSharp.Api --configuration Release

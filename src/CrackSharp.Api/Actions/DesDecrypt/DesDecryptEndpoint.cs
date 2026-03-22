@@ -1,28 +1,26 @@
 ﻿using CrackSharp.Api.Constants;
+using CrackSharp.Api.Services;
 using CrackSharp.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Azure.Functions.Worker;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Actions.DesDecrypt;
 
-internal static class DesDecryptEndpoint
+[SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by DI")]
+internal sealed class DesDecryptEndpoint(
+    DesBruteForceDecryptionService decryptionService,
+    Log<DesDecryptEndpoint> logger)
 {
-    public static IEndpointRouteBuilder MapDesDecryptEndpoint(this IEndpointRouteBuilder app)
-    {
-        app.MapGet("/decrypt/{*hash}", DecryptAsync).WithName("DecryptDesHash");
-        return app;
-    }
-
-    private static async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> DecryptAsync(
-        [AsParameters] DesDecryptServices services,
+    [Function("DecryptDesHash")]
+    public async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> DecryptAsync(
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/des/decrypt/{*hash}")] HttpRequest req,
         [Required][RegularExpression("^[./0-9A-Za-z]{13}$")] string hash,
         [Required][Range(1, 8)] int maxTextLength = 8,
         [Required][RegularExpression("^[./0-9A-Za-z]+$")] string chars = DesConstants.DecryptDefaultChars,
         CancellationToken cancellationToken = default)
     {
-        var decryptionService = services.DecryptionService;
-        var logger = services.Logger;
-
         try
         {
             logger.DecryptionRequested(hash, maxTextLength, chars);

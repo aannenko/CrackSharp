@@ -1,5 +1,8 @@
-﻿namespace CrackSharp.Api.Services;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace CrackSharp.Api.Services;
+
+[SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by DI")]
 internal sealed partial class Log<T>(ILogger<T> logger)
 {
     // Debug level logs - Decryption (10000-19999)

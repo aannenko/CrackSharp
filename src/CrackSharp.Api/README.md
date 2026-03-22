@@ -1,70 +1,50 @@
 ﻿# CrackSharp.Api
-Use code in this directory to build a .NET WebAPI service, capable of bruteforcing DES hashes produced by [crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html), using a specified charset and expected length of the text behind the hash. It can decrypt multiple hashes in parallel: it starts a new decryption task for each *unique* set of parameters (see remarks below).
+An Azure Functions app capable of bruteforcing DES hashes produced by [crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html), using a specified charset and expected length of the text behind the hash. It can decrypt multiple hashes in parallel: it starts a new decryption task for each *unique* set of parameters (see remarks below).
 
 The service also allows to calculate crypt(3)-like DES hashes from arbitrary text and, optionally, salt.
 
 ## Usage
-You will need [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) installed.
 
-PowerShell/bash:
+### Prerequisites
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local)
+- [Azurite](https://learn.microsoft.com/azure/storage/common/storage-use-azurite) for local storage emulation
+
+### Run locally
 ```powershell
-# Build and run the app
-dotnet run -c Release
+# Start Azurite in a separate terminal
+azurite
+
+# From the src/CrackSharp.Api directory, start the Functions host
+func start
 
 # Attempt to decrypt 50.jPgLzVirkc using a default charset
-curl -kL 'http://localhost:5000/api/v1/des/decrypt/50.jPgLzVirkc' # output: "hi"
+curl -kL 'http://localhost:7071/api/v1/des/decrypt/50.jPgLzVirkc' # output: "hi"
 
 # Attempt to decrypt 50.jPgLzVirkc using a charset 'efghij', give up after trying 'jjj'
-curl -kL 'http://localhost:5000/api/v1/des/decrypt/50.jPgLzVirkc?chars=efghij&maxTextLength=3' # output: "hi"
+curl -kL 'http://localhost:7071/api/v1/des/decrypt/50.jPgLzVirkc?chars=efghij&maxTextLength=3' # output: "hi"
 
 # Encrypt 'LOL' using random salt
-curl -kL 'http://localhost:5000/api/v1/des/encrypt/LOL' # output (something like): "FAzlTwVAZ1NZ2"
+curl -kL 'http://localhost:7071/api/v1/des/encrypt/LOL' # output (something like): "FAzlTwVAZ1NZ2"
 
 # Encrypt 'LOL' using salt '50'
-curl -kL 'http://localhost:5000/api/v1/des/encrypt/LOL?salt=50' # output: "50cI2vYkF0YU2"
+curl -kL 'http://localhost:7071/api/v1/des/encrypt/LOL?salt=50' # output: "50cI2vYkF0YU2"
+```
+
+### Deploy to Azure
+```powershell
+azd up
 ```
 
 ### Parameters
 Decryption
 - `{hash}` route value (required) - the service will attempt to find a combination of characters behind the given hash.
-- `maxTextLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Defalut value is `8` which is also the maximum, see remarks below.
+- `maxTextLength=<your_number_here>` (optional) - the service will check all character combinations (words) starting from 1 char-long and up to the provided word length before giving up. Default value is `8` which is also the maximum, see remarks below.
 - `chars=abcXYZ` (optional) - the service will only build combinations from these characters. Default value is `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`.
 
 Encryption
 - `{text}` route value (required) - the service will encrypt first 8 characters of the specified text (see remarks below) and return encryption result. If salt is not specified by the user, it is generated automatically.
 - `salt=<encryption_salt>` (optional) - salt allows for predictable encryption results. The first two characters of a hash is its salt.
-
-## Docker
-
-### Build image locally and run
-```powershell
-git clone https://github.com/aannenko/CrackSharp.git
-cd CrackSharp
-docker build -t crack-sharp .
-
-# run a container and attach to its console, container's files will be removed once it is stopped (useful for testing/debugging)
-docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 --name crack-sharp crack-sharp
-
-# -- OR --
-
-# run a container in detached mode
-docker run -d -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 --name crack-sharp crack-sharp
-```
-
-### Run a pre-made image
-```powershell
-docker run -it --rm -p 5000:5000 -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:latest
-```
-For supported platforms and available tags, see the [packages](https://github.com/aannenko/CrackSharp/pkgs/container/cracksharp).
-
-### Test
-Open `<container_address>/api/v1/des/encrypt/someText` in a browser to test encryption.
-
-### Scalar
-```powershell
-docker run -it --rm -p 5000:5000 -e DOTNET_ENVIRONMENT=Development -e ASPNETCORE_URLS=http://+:5000 ghcr.io/aannenko/cracksharp:latest
-```
-Open `<container_address>/scalar` in a browser to access the API documentation.
 
 ## Remarks
 1. Two or more decryption requests with the same trio of parameters `hash`, `maxTextLength` and `chars`, including omitted parameters with their default values, will start only one decryption task. When the decryption task is complete, all these requests will return the decrypted value or `404` if the hash could not be decrypted. Any request may be canceled during the decryption process - this will not cancel the task unless all the requests are canceled and no one is waiting for the task's completion, in which case the task is canceled.

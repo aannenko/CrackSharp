@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: cracksharp
+metadata:
+  template: functions-quickstart-dotnet-azd@1.1.0
+services:
+  api:
+    project: ./src/CrackSharp.Api/
+    language: dotnet
+    host: function

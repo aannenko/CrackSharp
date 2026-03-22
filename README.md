@@ -1,4 +1,4 @@
-﻿[![Build](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml) [![CodeQL](https://github.com/aannenko/CrackSharp/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/github-code-scanning/codeql) [![Docker](https://github.com/aannenko/CrackSharp/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/docker-publish.yml)
+﻿[![Build](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/dotnetcore.yml) [![CodeQL](https://github.com/aannenko/CrackSharp/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/aannenko/CrackSharp/actions/workflows/github-code-scanning/codeql)
 
 # CrackSharp
 Efficiently decrypt DES hashes produced by [crypt(3)](https://www.man7.org/linux/man-pages/man3/crypt.3.html).
@@ -8,7 +8,7 @@ Decryption is performed by .NET applications and is based on brute-force method.
 ## Contents
 Notable projects:
 - [CrackSharp.Cmd](https://github.com/aannenko/CrackSharp/tree/master/src/CrackSharp.Cmd) is a console app written as a solution to [CS50's Crack problem](https://docs.cs50.net/2019/ap/problems/crack/crack.html)
-- [CrackSharp.Api](https://github.com/aannenko/CrackSharp/tree/master/src/CrackSharp.Api) is a WebAPI service, ready for Docker
+- [CrackSharp.Api](https://github.com/aannenko/CrackSharp/tree/master/src/CrackSharp.Api) is an Azure Functions app deployable with [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview)
 
 ## Usage
 Deployment and usage examples are located in the corresponding project directories.

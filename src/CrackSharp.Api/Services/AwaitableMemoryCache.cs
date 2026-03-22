@@ -1,9 +1,11 @@
 ﻿using CrackSharp.Api.Awaiting;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Services;
 
+[SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by DI")]
 internal sealed class AwaitableMemoryCache<TKey, TValue>(
     IMemoryCache cache,
     IEqualityComparer<TKey>? keyComparer = null)

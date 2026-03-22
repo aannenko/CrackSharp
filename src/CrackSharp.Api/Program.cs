@@ -2,39 +2,28 @@
 using CrackSharp.Api.Extensions;
 using CrackSharp.Api.Serialization;
 using CrackSharp.Api.Services;
-using Scalar.AspNetCore;
+using Microsoft.Azure.Functions.Worker;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var host = new HostBuilder()
+    .ConfigureFunctionsWebApplication()
+    .ConfigureServices(static (context, services) =>
+    {
+        services.AddApplicationInsightsTelemetryWorkerService();
+        services.ConfigureFunctionsApplicationInsights();
 
-builder.Services.ConfigureHttpJsonOptions(
-    options => options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default));
+        services.ConfigureHttpJsonOptions(
+            options => options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default));
 
-builder.Services.AddOpenApi();
+        services.AddValidation();
+        services.AddProblemDetails();
 
-builder.Services.AddValidation();
-builder.Services.AddProblemDetails();
+        services.AddSingleton(typeof(Log<>));
 
-builder.Services.AddSingleton(typeof(Log<>));
+        services.AddMemoryCache(options => options.SizeLimit = context.Configuration.GetCacheSizeLimit());
+        services.AddSingleton(typeof(AwaitableMemoryCache<,>));
 
-builder.Services.AddMemoryCache(options => options.SizeLimit = builder.Configuration.GetCacheSizeLimit());
-builder.Services.AddSingleton(typeof(AwaitableMemoryCache<,>));
+        services.AddDesServices();
+    })
+    .Build();
 
-builder.Services.AddDesServices();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-else
-{
-    app.UseExceptionHandler();
-}
-
-app.UseStatusCodePages();
-
-app.MapDesEndpoints();
-
-await app.RunAsync().ConfigureAwait(false);
+await host.RunAsync().ConfigureAwait(false);

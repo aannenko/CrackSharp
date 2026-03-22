@@ -4,3 +4,15 @@ src/CrackSharp*/bin
 src/CrackSharp*/obj
 src/CrackSharp*/**/launchSettings.json
 *.csproj.user
+
+# Azure Functions local settings (may contain secrets)
+local.settings.json
+
+# Azurite local storage emulator files
+__azurite*
+__blobstorage*
+__queue*
+__table*
+
+# Azure Developer CLI environment config
+.azure/

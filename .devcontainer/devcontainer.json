@@ -1,11 +1,13 @@
 {
   "name": "CrackSharp Azure Functions Codespace",
   "dockerFile": "Dockerfile",
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-azuretools.vscode-bicep",
-        "ms-azuretools.vscode-docker",
         "ms-azuretools.vscode-azurefunctions",
         "ms-dotnettools.csdevkit",
         "azurite.azurite",
@@ -14,5 +16,5 @@
       ]
     }
   },
-  "forwardPorts": [5000, 7129]
+  "forwardPorts": [7071]
 }
