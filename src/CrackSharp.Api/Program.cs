@@ -3,27 +3,30 @@ using CrackSharp.Api.Extensions;
 using CrackSharp.Api.Serialization;
 using CrackSharp.Api.Services;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Builder;
 
-var host = new HostBuilder()
-    .ConfigureFunctionsWebApplication()
-    .ConfigureServices(static (context, services) =>
-    {
-        services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();
+var builder = FunctionsApplication
+    .CreateBuilder(args)
+    .ConfigureFunctionsWebApplication();
 
-        services.ConfigureHttpJsonOptions(
-            options => options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default));
+var services = builder.Services;
 
-        services.AddValidation();
-        services.AddProblemDetails();
+services.AddApplicationInsightsTelemetryWorkerService();
+services.ConfigureFunctionsApplicationInsights();
 
-        services.AddSingleton(typeof(Log<>));
+services.ConfigureHttpJsonOptions(static options =>
+    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default));
 
-        services.AddMemoryCache(options => options.SizeLimit = context.Configuration.GetCacheSizeLimit());
-        services.AddSingleton(typeof(AwaitableMemoryCache<,>));
+services.AddValidation();
+services.AddProblemDetails();
 
-        services.AddDesServices();
-    })
-    .Build();
+services.AddSingleton(typeof(Log<>));
+
+services.AddMemoryCache(options => options.SizeLimit = builder.Configuration.GetCacheSizeLimit());
+services.AddSingleton(typeof(AwaitableMemoryCache<,>));
+
+services.AddDesServices();
+
+var host = builder.Build();
 
 await host.RunAsync().ConfigureAwait(false);
