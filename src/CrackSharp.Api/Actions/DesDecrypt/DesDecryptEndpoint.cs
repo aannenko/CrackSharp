@@ -3,7 +3,6 @@ using CrackSharp.Api.Services;
 using CrackSharp.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Azure.Functions.Worker;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Actions.DesDecrypt;
@@ -14,13 +13,16 @@ internal sealed class DesDecryptEndpoint(
     Log<DesDecryptEndpoint> logger)
 {
     [Function("DecryptDesHash")]
-    public async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult>> DecryptAsync(
+    public async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult, ValidationProblem>> DecryptAsync(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/des/decrypt/{*hash}")] HttpRequest req,
-        [Required][RegularExpression("^[./0-9A-Za-z]{13}$")] string hash,
-        [Required][Range(1, 8)] int maxTextLength = 8,
-        [Required][RegularExpression("^[./0-9A-Za-z]+$")] string chars = DesConstants.DecryptDefaultChars,
+        string hash,
+        int maxTextLength = 8,
+        string chars = DesConstants.DecryptDefaultChars,
         CancellationToken cancellationToken = default)
     {
+        if (DesDecryptEndpointFilter.HasErrors(hash, maxTextLength, chars, out var errors))
+            return TypedResults.ValidationProblem(errors);
+
         try
         {
             logger.DecryptionRequested(hash, maxTextLength, chars);
@@ -32,14 +34,14 @@ internal sealed class DesDecryptEndpoint(
 
             return TypedResults.Ok(decrypted);
         }
-        catch (DecryptionFailedException e)
+        catch (DecryptionFailedException)
         {
-            logger.DecryptionFailed(e, hash, maxTextLength, chars);
+            logger.DecryptionFailed(hash, maxTextLength, chars);
             return TypedResults.NotFound();
         }
-        catch (OperationCanceledException e)
+        catch (OperationCanceledException)
         {
-            logger.DecryptionCanceled(e, hash, maxTextLength, chars);
+            logger.DecryptionCanceled(hash, maxTextLength, chars);
             return TypedResults.StatusCode(StatusCodes.Status408RequestTimeout);
         }
         catch (Exception e)

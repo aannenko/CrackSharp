@@ -1,7 +1,6 @@
 ﻿using CrackSharp.Api.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Azure.Functions.Worker;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CrackSharp.Api.Actions.DesEncrypt;
@@ -12,11 +11,14 @@ internal sealed class DesEncryptEndpoint(
     Log<DesEncryptEndpoint> logger)
 {
     [Function("GetDesHash")]
-    public Ok<string> Encrypt(
+    public Results<Ok<string>, ValidationProblem> Encrypt(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/des/encrypt/{*text}")] HttpRequest req,
-        [Required][RegularExpression("^[./0-9A-Za-z]+$")] string text,
-        [RegularExpression("^[./0-9A-Za-z]{2}$")] string? salt = null)
+        string text,
+        string? salt = null)
     {
+        if (DesEncryptEndpointFilter.HasErrors(text, salt, out var errors))
+            return TypedResults.ValidationProblem(errors);
+
         try
         {
             logger.EncryptionRequested(text, salt);

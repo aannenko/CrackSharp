@@ -47,13 +47,13 @@ internal sealed partial class Log<T>(ILogger<T> logger)
         EventId = 1002,
         Level = LogLevel.Information,
         Message = "Decryption of the Hash '{Hash}' with MaxTextLength {MaxTextLength} and Chars '{Chars}' failed. Value not found.")]
-    public partial void DecryptionFailed(Exception exception, string hash, int maxTextLength, string chars);
+    public partial void DecryptionFailed(string hash, int maxTextLength, string chars);
 
     [LoggerMessage(
         EventId = 1003,
         Level = LogLevel.Information,
         Message = "Decryption of the Hash '{Hash}' with MaxTextLength {MaxTextLength} and Chars '{Chars}' canceled.")]
-    public partial void DecryptionCanceled(Exception exception, string hash, int maxTextLength, string chars);
+    public partial void DecryptionCanceled(string hash, int maxTextLength, string chars);
 
     // Information level logs - Encryption (2000-2999)
     [LoggerMessage(

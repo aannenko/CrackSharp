@@ -17,7 +17,6 @@ services.ConfigureFunctionsApplicationInsights();
 services.ConfigureHttpJsonOptions(static options =>
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default));
 
-services.AddValidation();
 services.AddProblemDetails();
 
 services.AddSingleton(typeof(Log<>));
