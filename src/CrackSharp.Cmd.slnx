@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="CrackSharp.Cmd/CrackSharp.Cmd.csproj" />
+  <Project Path="CrackSharp.Core/CrackSharp.Core.csproj" />
+</Solution>
