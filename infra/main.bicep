@@ -47,7 +47,7 @@ param environmentName string
   }
 })
 param location string
-param vnetEnabled bool
+param vnetEnabled bool = false
 param apiServiceName string = ''
 param apiUserAssignedIdentityName string = ''
 param applicationInsightsName string = ''
@@ -212,7 +212,7 @@ module logAnalytics 'br/public:avm/res/operational-insights/workspace:0.11.1' = 
     dataRetention: 30
   }
 }
- 
+
 module monitoring 'br/public:avm/res/insights/component:0.6.0' = {
   name: '${uniqueString(deployment().name, location)}-appinsights'
   scope: rg

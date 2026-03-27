@@ -13,7 +13,7 @@ internal sealed class DesDecryptEndpoint(
     Log<DesDecryptEndpoint> logger)
 {
     [Function("DecryptDesHash")]
-    public async Task<Results<Ok<string>, NotFound, StatusCodeHttpResult, ValidationProblem>> DecryptAsync(
+    public async Task<Results<Ok<string>, NotFound<string>, StatusCodeHttpResult, ValidationProblem>> DecryptAsync(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "v1/des/decrypt/{*hash}")] HttpRequest req,
         string hash,
         int maxTextLength = 8,
@@ -34,10 +34,10 @@ internal sealed class DesDecryptEndpoint(
 
             return TypedResults.Ok(decrypted);
         }
-        catch (DecryptionFailedException)
+        catch (DecryptionFailedException e)
         {
             logger.DecryptionFailed(hash, maxTextLength, chars);
-            return TypedResults.NotFound();
+            return TypedResults.NotFound(e.Message);
         }
         catch (OperationCanceledException)
         {

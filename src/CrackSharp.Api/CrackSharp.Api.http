@@ -66,8 +66,8 @@ GET {{CrackSharp_Api_HostAddress}}/encrypt/abc?salt=def
 
 GET {{CrackSharp_Api_HostAddress}}/decrypt/FAzlTwVAZ1NZ2?maxTextLength=2
 
-### 404 Not Found
+### 404 Not Found - if not cached, otherwise 200 "LOL"
 
 GET {{CrackSharp_Api_HostAddress}}/decrypt/FAzlTwVAZ1NZ2?chars=L
 
-### 404 Not Found
+### 404 Not Found - if not cached, otherwise 200 "LOL"
