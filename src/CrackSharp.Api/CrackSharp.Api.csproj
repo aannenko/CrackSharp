@@ -9,6 +9,7 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <AnalysisMode>All</AnalysisMode>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <UserSecretsId>6d037d18-cde6-4753-b45c-db449a5b9bd8</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
